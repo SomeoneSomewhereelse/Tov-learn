@@ -47,6 +47,7 @@
 | S8 | **Manual done-when checks are run by the user interactively and recorded in the PR description** | Headless `claude -p` can't exercise `AskUserQuestion` and doesn't reliably show hook-error notices |
 | S9 | **`validate.yml` gets `permissions: contents: read`** | Least privilege, from the secure-use guide. A one-line addition to item 15 |
 | S10 | **A new unit N (numbering contract) is proposed between F and 1a.** It's out of scope here (§9) | Renumbering churn (1a, 1b, 1c) comes before any later stage could prevent it |
+| S11 | **`changes.md` gets one final `# Changes — stage0/quick-wins branch` section** in the file's current format, written once when the PR is ready (no rolling updates). No branch rename | The D10 docs rule (each unit documents its own change). The two most recent merged PRs (#12, #13) use typed branch names. F converts every section to Keep-a-Changelog (D10) |
 
 ---
 
@@ -88,7 +89,7 @@ Checked per D7b. Each row gives the source and method.
 | **C: Course content** | 1, 3, 4, 5 (+G1), 10, 16 | `courses/ai-dev/COURSE.md`; scripts and exercises in 0.2–0.4, 1.1–1.3, 1.6–1.8, 2.1–2.6 |
 | **B: old_B** | 12 (content part) | `03-final-project/projects.md` → **new** `03-final-project/old_B-document-intelligence.md` |
 | **T: Tutor** | 6, 7, 11, 12 (+G4), 14 | `.claude/commands/learn.md`; all 15 `learn/*.md` (frontmatter); body edits in `setup.md`, `security.md`, `project.md`, `resume.md` |
-| **D: Docs** | 8 (+G2), 13, the CLAUDE.md test command | `setup.md` §F, `README.md`, `CLAUDE.md`, `CONTRIBUTING.md` (line 61 only) |
+| **D: Docs** | 8 (+G2), 13, the CLAUDE.md test command, the `changes.md` section (S11) | `setup.md` §F, `README.md`, `CLAUDE.md`, `CONTRIBUTING.md` (line 61 only), `changes.md` |
 
 ### 4.2 Course content (groups C and B)
 
@@ -286,11 +287,19 @@ disable-model-invocation: true
   - The Setup row (`:14`) drops "global install".
   - Step 4 of "הוספת מודול חדש" (`:75`) is deleted.
 - **`CONTRIBUTING.md`:** delete `:61` only. Everything else in it is F's.
-- `changes.md` is history and is left unchanged.
+- The existing `changes.md` sections are history and are left unchanged.
 
 #### Item 13: README tester note
 - **Placement:** directly under the README's title/banner, between `<!-- TEMPORARY: remove at first-cohort gate (PRD D10) -->` and `<!-- /TEMPORARY -->`, as a blockquote.
 - **Text:** the PRD's wording ("Fresh install only. Before testing, delete `~/skill-tutor-tutorials/` (`%USERPROFILE%\skill-tutor-tutorials` on Windows) and any old global install at `~/.claude/commands/learn.md` and `~/.claude/commands/learn/`."), plus: "…or run `/learn setup`, which offers to move them into a backup for you."
+
+#### `changes.md` section (S11)
+- **Where:** appended as a new H1, `# Changes — stage0/quick-wins branch`, after the existing sections. It matches the existing `# Changes — <branch> branch` style: an Overview, numbered `##` entries with Before/After, and a File Map.
+- **When:** written **once**, as the last commit of group D, when the PR is otherwise complete. No rolling updates.
+- **Content:**
+  - one numbered entry per learner- or contributor-visible change (the 16 items and G1/G2/G4), grouped as in §4.1
+  - a **Testers** note: "reset your data, or run `/learn setup` and choose the backup option"
+- F later converts every section, this one included, to Keep-a-Changelog (D10).
 
 #### Test command in `CLAUDE.md`
 A new short section, "## בדיקות":
@@ -402,12 +411,12 @@ In `../Tov-learn-stage0`, on branch `stage0/quick-wins`, and only when the user 
 3. **P3:** `settings.json` → `{}`
 4. **C:** COURSE.md → VAT → 0.4 markers → residue → 1.3 hook → 1.6 Supabase → old_B, one commit each
 5. **T:** frontmatter → aliases → project/resume → security → clean-slate
-6. **D:** global-install removal → tester note → test command
+6. **D:** global-install removal → tester note → test command → `changes.md` section (last)
 
 Each commit is followed by a local run of the test command. The last commit must be fully green.
 
 ### 6.2 The PR description (required sections)
-- **Summary:** a table of the 16 items and G1/G2/G4, each mapped to its commit.
+- **Summary:** a table of the 16 items and G1/G2/G4, each mapped to its commit, plus a link to the new `changes.md` section.
 - **Automated verification:**
   - the unittest output, including the seeded-regression list
   - the validator's `PASSED`
