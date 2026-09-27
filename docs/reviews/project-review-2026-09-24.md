@@ -697,4 +697,4 @@ ta also flagged a line-number slip (`generate-slideshow.ps1:29` → `:30`); it's
   - `courses/_archive/`, entirely
   - running `/learn` or touching real learner data
   - any paid or metered API call, and any use of credentials
-- **Writes:** read-only on the repo. The only files written are `.review-panel/*` (git-excluded) and this report, later committed at `docs/reviews/project-review.md`.
+- **Writes:** read-only on the repo. The only files written are `.review-panel/*` (git-excluded) and this report, later committed at `docs/reviews/project-review-2026-09-24.md`.
