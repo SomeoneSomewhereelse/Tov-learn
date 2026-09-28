@@ -1,7 +1,7 @@
 # Stage 0 — Quick-Win PR: Design Spec
 
-**Date:** 2026-09-27 · **Revision:** 4 (2026-09-28), after three independent reviews (§10) · **Status:** approved in brainstorming; pending the user's review of revision 4
-**Parent:** `docs/prds/project-redesign-2026-09-25.md` (the PRD). References such as "D2 item 5", "§3" and "R14" point there. "Review §2.x" points to `docs/reviews/project-review-2026-09-24.md`. "RV-…", "RV2-…" and "RV3-…" point to the spec reviews (§10).
+**Date:** 2026-09-27 · **Revision:** 5 (2026-09-28), after four independent reviews (§10) · **Status:** approved in brainstorming; pending the user's review of revision 5
+**Parent:** `docs/prds/project-redesign-2026-09-25.md` (the PRD). References such as "D2 item 5", "§3" and "R14" point there. "Review §2.x" points to `docs/reviews/project-review-2026-09-24.md`. "RV-…" through "RV4-…" point to the spec reviews (§10).
 **Baseline:** `master` at `290af75` (= `origin/master`, after #12 and #13 were merged on 2026-09-28). Its tree is identical to the earlier local `d04ca2a` (tree `5bf8edb`), so every line number below refers to that tree.
 **Scope:** Stage 0 only:
 - D2's 16 items
@@ -39,6 +39,7 @@
   - Then create a manual worktree: `git worktree add ../Tov-learn-stage0 -b fix/stage0-quick-wins master`.
   - Never use `EnterWorktree`. uv creates the worktree's own `.venv`.
   - Commit or push only when the user asks.
+- **Known, deferred: the docs aren't on `master` yet (RV4-M2; user decision).** This spec, the PRD and the review live only on `docs/project-review-2026-09-24`. Once the spec is locked, that branch goes up as its own PR, and the user merges it manually **before** Stage 0 implementation starts. The Stage 0 worktree (cut from `master` after that merge) then contains the docs, and the baseline guard tolerates the docs-only change. **Spec reviewers: ignore this issue.**
 
 ---
 
@@ -63,8 +64,8 @@
 | S15 | **Dependabot is adopted now for `github-actions` only**, weekly. The `uv` ecosystem is deferred | Keeps the SHA pins fresh. Dependabot's documented uv version is v0.11 |
 | S16 | **The Supabase MCP stays read-only.** `1.6_exercises.md:103` is rewritten, and the documented `/mcp` → Authenticate step is added (RV-H2, RV2-M3) | A read-only boundary for beginners. The exercise must not fail as written |
 | S17 | **A new check, `spoken_lesson_refs`:** every spelled "W נקודה W" and hyphenated ordinal ("חמישי-שלוש") in course content must name an existing lesson, apart from an explicit phrase allowlist (RV2-M6). It handles one-letter prefixes (ו/ב/ל/ש/ה/מ/כ) and every table form (RV3-H1–H3) | Makes the residue pass complete over every form it parses, and keeps it that way until N replaces it |
-| S18 | **Stage 0's `changes.md` commit also adds the missing sections for #12 and #13** (user decision) | They were merged during this work without `changes.md` entries. Folding them in avoids a direct push to `master` and another conflict-prone edit. Earlier PRs without sections (#8–#11) are left for F's Keep-a-Changelog conversion (RV3-L12) |
-| S19 | **Two more denylist entries:** `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `קוד יציאה אחד` (RV3-L11) | Stage 0 fixes both occurrences (`1.6_exercises.md:21`, `1.3_script.txt:29`), and review §2.15 A lists both. PRD D2 item 9 allows entries Stage 0 fully fixes |
+| S18 | **Stage 0's `changes.md` commit also adds the missing sections for #12 and #13** (user decision) | They were merged during this work without `changes.md` entries. Folding them in avoids a direct push to `master` and another conflict-prone edit. Earlier PRs without sections (#1, #5–#11; only `sean_changes` #2 and `yuval_ver` #3 have sections) are left for F's Keep-a-Changelog conversion (RV3-L12, RV4-L7) |
+| S19 | **Two more denylist entries:** `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and the *wrong claim* `מחזיר(ה\|ים)?\s+קוד\s+יציאה\s+אחד` ("returns exit code one", as in `1.3_script.txt:29` "ומחזיר קוד יציאה אחד"). The bare phrase "קוד יציאה אחד" stays legal, so the correction ("exit code one doesn't block") can say it (RV3-L11, RV4-M1) | Stage 0 fixes both occurrences, and review §2.15 A lists both. PRD D2 item 9 allows entries Stage 0 fully fixes |
 | S20 | **Dev loop:** `uv run ruff check -q && uv run pytest -q` routinely; `uv run pytest -v` when red; `uv run pytest --collect-only -q` for the PR's list of test IDs (RV3-L1, RV3-L6) | Cheap routine runs. Ruff is never skipped by an expected red test. The PR still gets IDs |
 
 ---
@@ -81,7 +82,7 @@ Checked per D7b. "(reviewer)" marks facts verified by a spec review that are not
 | `checkout@v4` / `setup-python@v5` declare `node20`; Node 20 retired on runners 2026-09-23 | Confirmed | `action.yml`; github.blog changelog |
 | uv **0.12.19**; pytest **9.1.1** (Python ≥3.10); ruff **0.16.9**; `ruff check -q` prints diagnostics only | Confirmed | GitHub API; PyPI JSON; `ruff check --help` |
 | Python 3.14.7 is the latest 3.14; active support until 2027-10-01, security until 2030-10-31. 3.15.0 final is scheduled for 2026-10-01 | Confirmed | endoflife.date/api/python/3.14.json; PEP 790 (raw, status Active) |
-| Claude Code sets `CLAUDECODE` and `CLAUDE_CODE_ENTRYPOINT` for its tools, but no version variable, so `claude --version` reports whichever `claude` is on PATH, which may not be the running binary | Confirmed in this session's environment (limitation, RV3-L4) | `env` |
+| Claude Code sets `CLAUDECODE` and `CLAUDE_CODE_ENTRYPOINT` for its tools, but no version variable, so `claude --version` reports whichever `claude` is on PATH, which may not be the running binary | Confirmed in this session's environment (limitation, RV3-L4). There is also an **undocumented** `CLAUDE_CODE_EXECPATH` (the running binary's path; not in env-vars.md or the CHANGELOG). Stage 0 keeps the documented `claude --version`; preferring `$CLAUDE_CODE_EXECPATH` when set is a possible later improvement (RV4-L5) | `env` |
 | Dependabot supports `github-actions` and `uv` (the uv row lists v0.11); it updates the version comment beside a SHA pin | Confirmed / (reviewer) | docs.github.com (article-body API) |
 | Only exit 2 blocks PreToolUse; exit 1 is non-blocking | Confirmed | hooks.md (raw) |
 | Hook `if` added in **2.1.85**; `Read(.env)`-style path patterns match from **2.1.176** | Confirmed | anthropics/claude-code `CHANGELOG.md` (raw) |
@@ -217,12 +218,12 @@ All 19 `[SLIDE TRANSITION]` → `[מעבר שקף]`. No other *marker* change. I
    }
    ```
    The native-Windows (no Git Bash) variant uses `"command": "[Console]::Error.WriteLine('Blocked by hook: secret-demo.txt is protected'); exit 2"`.
-3. **Negative test.** Restart Claude Code in the folder and ask it to read `secret-demo.txt`. It is blocked, and Claude repeats the reason. *If Claude immediately tries the terminal on its own, that's step 5 happening early. Note it.*
+3. **Negative test.** Restart Claude Code in the folder and ask **in words** (not with an `@secret-demo.txt` mention) to read `secret-demo.txt`. It is blocked, and Claude repeats the reason. *If Claude immediately tries the terminal on its own, that's step 5 happening early. Note it.*
 4. **Positive control.** Reading `notes.txt` works.
 5. **The bypass.** Ask explicitly: "run `cat secret-demo.txt` in the terminal" (`Get-Content` without Git Bash). The content appears.
    - *If Claude declines,* the refusal is model behaviour, not enforcement. Record what happened.
 6. **Takeaway (text), RV2-L5:**
-   - A hook is a deterministic guardrail for the specific tool calls it matches. Other tools (Bash, PowerShell, Grep) still reach the file, so a hook is not a security boundary.
+   - A hook is a deterministic guardrail for the specific tool calls it matches. Other tools (Bash, PowerShell, Grep) still reach the file, and so, probably, does an `@file` mention, which isn't a Read tool call (unverified, RV4-L6). So a hook is not a security boundary.
    - Claude Code has stronger layers:
      - permission **deny rules**, which also cover `cat`/`head`/`tail`, though not scripts that open files themselves
      - the **sandbox**, which is OS-enforced (macOS, Linux, WSL2)
@@ -259,7 +260,7 @@ Nothing deletes a file or asks the learner to try.
 ### 4.3 Tutor (group T)
 
 #### Item 11: frontmatter
-All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n---` block, with no other keys. `display.md` gets it too, but nothing else (its English-only command list at `:114` is unreferenced; D8a folds it later). `learn.md` gets **no frontmatter**; its body edits are items 7 and 12 (S2a decides invocability) (RV3-L3).
+All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n---` block, with no other keys. `display.md` gets it too, but nothing else (its English-only command list at `:114` is unreferenced; D8a folds it later). `learn.md` gets **no frontmatter**; its body edits are item 7 and, for item 12, `learn.md:105`: "project — final project mode" → "project — final projects (until unit 1e: shows 'being rebuilt')". S2a decides invocability (RV3-L3, RV4-L3).
 
 #### Item 7: Hebrew aliases (S2)
 - **`learn.md` Learner Commands:**
@@ -307,8 +308,8 @@ All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n--
    - `$HOME/.claude/commands/learn.md`
    - `$HOME/.claude/commands/learn/`
 
-   Relative paths are forbidden, because the repo has its own `skill-tutor-tutorials/`. If none exists, skip silently to 0.1.
-2. **Show.** Each path found, with its file count and newest modification date. If a path is a **symlink**, show that and its target (RV2-L11).
+   Relative paths are forbidden, because the repo has its own `skill-tutor-tutorials/`. If none exists, print one Hebrew line ("no leftovers from an earlier install were found") and continue to 0.1 (RV4-L1).
+2. **Show.** Each path found, with its file count and newest modification date. Counts **never follow symlinks**: a symlink counts as one entry, and its target is shown next to it (RV2-L11, RV4-L4).
 3. **Ask.** One `AskUserQuestion`, in Hebrew:
    - `להשאיר הכל` (listed first): nothing is touched.
    - `להעביר לגיבוי ולהתחיל מחדש`: everything moves to `~/skill-tutor-tutorials-backup-<date>`; nothing is lost.
@@ -327,7 +328,7 @@ All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n--
    - `mv` moves a symlink as a link and never follows it. PowerShell uses `Move-Item -LiteralPath … -ErrorAction Stop`, after checking `$HOME` is non-empty.
    - On any error: stop and report. Never retry with force, and never delete.
    - **Across filesystems (RV3-M4).** If a source sits on another filesystem (e.g. `~/.claude/commands` symlinked to `/mnt/c/…`), `mv` copies and then removes the original. An interruption leaves the original intact, or both copies, but never neither. The step claims "nothing is lost", not "nothing is unlinked".
-5. **Verify and report.** Each original path is gone and present in the backup. The backup's **file counts equal the counts shown in step 2** (RV3-M4). Print the backup path.
+5. **Verify and report.** Each original path is gone and present in the backup. The backup's **entry counts, taken the same no-follow way, equal the counts shown in step 2** (RV3-M4, RV4-L4). Print the backup path.
 6. **Continue or stop.** If a global command was moved, stop and ask the tester to reopen Claude Code and run `/learn setup` again. Otherwise continue to 0.1.
 
 **Hard rules, stated in the section:**
@@ -362,7 +363,7 @@ The "add a module" steps in `README.md:196-202`, `CONTRIBUTING.md:57-61` and CLA
 
 #### Item 13: README tester note
 - **Placement:** under the title/banner, between `<!-- TEMPORARY: remove at first-cohort gate (PRD D10) -->` and `<!-- /TEMPORARY -->`.
-- **Text:** the PRD's wording, then: "…or run `/learn setup`, which offers to move them into a backup for you. **If `/learn setup` doesn't show that offer, you have an older global install: move or delete `~/.claude/commands/learn.md` and `~/.claude/commands/learn/` by hand, then restart Claude Code**" (RV2-M2).
+- **Text:** the PRD's wording, then: "…or run `/learn setup`, which offers to move them into a backup for you. **If `~/.claude/commands/learn.md` exists and `/learn setup` doesn't offer to move it, you have an older global install: move or delete `~/.claude/commands/learn.md` and `~/.claude/commands/learn/` by hand, then restart Claude Code**" (RV2-M2, RV4-L1).
 
 #### README version floor (S14, RV2-L6)
 - "Step 1 — Prerequisites" (`:25`): "Claude Code 2.1.176 or later installed (Pro plan or higher)".
@@ -378,7 +379,7 @@ The "add a module" steps in `README.md:196-202`, `CONTRIBUTING.md:57-61` and CLA
 - **`CONTRIBUTING.md` "Pull Requests" (`:65-69`):** add one line, "run `uv run ruff check -q && uv run pytest -q` before opening a PR" (RV3-L2).
 
 #### RV3-M7: document what CI now enforces, and the aliases
-- **`CONTRIBUTING.md` "Adding a Lesson" (`:13-35`):** one line. CI requires ≥ 5 `[מעבר שקף]` markers per script, an exercise H1 with `שיעור X.Y` and a matching `**שיעור:**` line, a `COURSE.md` row with a correct module range, and spoken lesson references that name existing lessons. "See `tests/validate_structure.py`."
+- **`CONTRIBUTING.md` "Adding a Lesson" (`:13-35`):** one line. CI requires ≥ 5 `[מעבר שקף]` markers per script, an exercise H1 with `שיעור X.Y` and a matching `**שיעור:**` line, a `COURSE.md` row with a correct module range, and spoken lesson references that name existing lessons. "See `tests/validate_structure.py`. The example below predates these rules; F rewrites it." (RV4-L9)
 - **`README.md` command table (`:113-124`) and `:72`:** add the Hebrew aliases: `continue / המשך`, `quiz me / בוחן`, `stop / עצור / סיום`.
 
 #### `changes.md` (S11, S18)
@@ -396,7 +397,7 @@ Written once, as the last commit of group D, appended after the existing section
 - A `CHECKS` tuple lists them all. No `main()`, no printing, no import-time work.
 - **Course scope:** `courses/*/` except `courses/_archive/`, skipping `old_B*` files.
 - **File discovery (RV2-L8):** a helper `repo_files(root, pattern)`:
-  - uses `git ls-files` when `root/.git` exists, so local results match CI
+  - uses `git ls-files -z` when `root/.git` exists, so local results match CI, and non-ASCII paths come out unquoted. Entries missing on disk (deleted in the working tree) are skipped (RV4-L10)
   - otherwise walks the filesystem (the pytest fixture trees)
 
 | Check | Rule |
@@ -405,7 +406,7 @@ Written once, as the last commit of group D, appended after the existing section
 | `slide_markers` | Every `*_script.txt` has ≥ 5 `[מעבר שקף]` and zero `[SLIDE TRANSITION]` |
 | `header_numbers` | **Exercises:** the first `# ` heading contains `שיעור X.Y`, and any `**שיעור:**` line contains `X.Y`, both equal to the folder.<br>**Scripts:** in the first 3 non-empty lines, every `(שיעור\|Lesson)\s+(\d+\.\d+)` and every `שיעור\s+([א-ת]+)\s+נקודה\s+([א-ת]+)` equals the folder. `W` is `[א-ת]+`, mapped by the digit-word table (אפס; אחת/אחד; שתיים/שניים/שתים; שלוש/שלושה; ארבע/ארבעה; חמש/חמישה; שש/שישה; שבע/שבעה; שמונה; תשע/תשעה); an unmapped word is a finding |
 | `spoken_lesson_refs` (S17) | Signature `check_spoken_lesson_refs(root, allowlist=SPOKEN_ALLOWLIST)`, so tests pass their own allowlist (RV3-H3).<br>In every course-scope `*_script.txt` and `*_exercises.md`:<br>(a) every match of `(?<![א-ת])([א-ת]+)\s+נקודה\s+([א-ת]+)` whose words map through the digit-word table, after stripping **at most one** leading prefix letter from `ובלשהמכ` if the bare word isn't in the table, must form an `X.Y` that's an **existing lesson folder number** in that course<br>(b) every hyphenated ordinal `(ראשון|שני|שלישי|רביעי|חמישי|שישי|שביעי|שמיני)-([א-ת]+)`, mapped to X and Y the same way, must likewise name an existing lesson<br>A match inside an allowlisted phrase is skipped. `SPOKEN_ALLOWLIST` is a tuple of (file-name glob, exact phrase), seeded from §4.2's stay list:<br>• `0.3_script.txt`, "ושבע נקודה אחת אחוז"<br>• `1.1_script.txt`, "ארבע נקודה שש" and "שש נקודה שש מיליארד"<br>• `1.5_script.txt`, "שישה נקודה שישה מיליארד"<br>• `2.1_script.txt`, "שתיים נקודה אפס"<br>• `2.5_script.txt`, "שלוש נקודה שלוש עשרה", "שלוש נקודה ארבע עשרה" and "ארבע נקודה שבע"<br>**Stale entry (a finding):** the glob matches at least one course-scope file, and the exact phrase occurs in none of them (RV3-H3). N replaces this check |
-| `course_name_denylist` | No `קורס\s+(ה-)?AI Engineer`, `\*\*קורס:\*\*\s*AI Engineer` or `AI Engineer course` (case-insensitive) in course scope. The job title passes. **Plus (S19):** `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `קוד יציאה אחד`. The check keeps its name, since F renames it into the full denylist |
+| `course_name_denylist` | No `קורס\s+(ה-)?AI Engineer`, `\*\*קורס:\*\*\s*AI Engineer` or `AI Engineer course` (case-insensitive) in course scope. The job title passes. **Plus (S19):** `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `מחזיר(ה\|ים)?\s+קוד\s+יציאה\s+אחד`. The check keeps its name, since F renames it into the full denylist |
 | `tutor_refs` | In `.claude/**/*.md`:<br>(a) backticked paths starting with `.claude/` or `courses/` exist, except `LOCAL_ONLY = {".claude/settings.local.json"}`<br>(b) a backticked bare `name.md` directly after a word-bounded `Read`/`Load` (any case) exists in the referring file's folder<br>Skips `~/…` and placeholders (`[`, `{`, `*`, `X.Y`). **`${CLAUDE_SKILL_DIR}` resolution is M's extension (§9; RV2-M4)** |
 | `settings_json` | `.claude/settings.json`, if present, parses, and contains no `powershell` (case-insensitive) |
 | `relative_links` | In every tracked `*.md`, after removing fenced blocks and inline code spans, every `[text](target)` that isn't `http:`/`https:`/`mailto:`/`#…` resolves (after stripping `#fragment`). Skips `_archive/` and `old_B*` |
@@ -415,7 +416,7 @@ Written once, as the last commit of group D, appended after the existing section
 
 ### 5.2 `tests/test_validate_structure.py` (pytest)
 - **Fixture:** a `good_tree` fixture in `tmp_path`, deliberately **not** a git repo, so it exercises the filesystem path of `repo_files`. It contains:
-  - one course (two modules, three lessons, valid scripts/exercises), and `COURSE.md`
+  - one course with modules `00-…` (lessons 0.1, 0.2) and `02-…` (lesson 2.1), valid scripts and exercises, and `COURSE.md`
   - `.claude/commands/learn.md` routing to `teaching.md` ("Step 5" plus `Read \`quiz.md\``), `quiz.md`, and `setup.md` (with CLEAN-SLATE markers)
   - `.claude/settings.json`
   - a README with a relative link
@@ -423,12 +424,13 @@ Written once, as the last commit of group D, appended after the existing section
   - between the CLEAN-SLATE markers, a bash block **and a PowerShell block** (`New-Item`, `Move-Item -LiteralPath`) with no delete verbs (RV3-M3)
 - **`test_good_tree_passes`:** every check returns `[]`.
 - **A separate `git_tree` test:** `git init` + `git add` on a copy of the good tree, plus one **untracked** broken-link file. `relative_links` ignores the untracked file.
+- **One way to call checks on fixtures (RV4-H1):** a `fixture_checks()` helper returns `CHECKS` with `spoken_lesson_refs` bound to `allowlist=FIXTURE_ALLOWLIST` (e.g. `functools.partial`). **Every** fixture test (good tree, seeds and negatives) uses it. The default `SPOKEN_ALLOWLIST` is used only by `test_real_repo_passes`. Seeds for `spoken_lesson_refs` sit after line 3, so `header_numbers` never sees them.
 - **Seeded regressions,** parametrized. Each asserts the named check fails and all others pass. At minimum:
   - `course_md`: a missing row; an extra row; a swap; a wrong range
   - `slide_markers`: 4 markers; `[SLIDE TRANSITION]`
-  - `header_numbers`: `שיעור 5.1` in 2.1; a mismatched `**שיעור:**`; `שיעור 0.1` in 0.2; spelled `חמש נקודה אחת`; an unmapped word
+  - `header_numbers`: `שיעור 5.1` in 2.1; a mismatched `**שיעור:**`; `שיעור 0.1` in 0.2; spelled "שיעור אפס נקודה אחת" in the 2.1 script (an existing but wrong lesson, so `spoken_lesson_refs` stays green, RV4-H1); an unmapped word
   - `spoken_lesson_refs`: "שלוש נקודה שתיים" (no lesson 3.2); prefixed "ושלוש נקודה חמש"; a gendered form "שישה נקודה שבעה"; a hyphenated "חמישי-ארבע"; a stale allowlist entry (the fixture's own allowlist names a phrase absent from its file)
-  - `course_name_denylist`: `בקורס AI Engineer`; `- **קורס:** AI Engineer`; `NEXT_PUBLIC_SUPABASE_ANON_KEY`; `קוד יציאה אחד`
+  - `course_name_denylist`: `בקורס AI Engineer`; `- **קורס:** AI Engineer`; `NEXT_PUBLIC_SUPABASE_ANON_KEY`; `ומחזיר קוד יציאה אחד`
   - `tutor_refs`: a missing `.claude/…` route; `Read \`missing.md\``
   - `settings_json`: `powershell`; invalid JSON
   - `relative_links`: a missing target
@@ -442,7 +444,7 @@ Written once, as the last commit of group D, appended after the existing section
   - "already … `x.md`"; "load … from `projects.md`"
   - `http(s)` and `#anchor` links; a broken link in a code fence and in inline code
   - spelled numbers followed by `,` `:` `.`
-  - an allowlisted phrase; a spoken reference to an existing lesson
+  - an allowlisted phrase; a spoken reference to an existing lesson; the correct sentence "קוד יציאה אחד לא חוסם" (RV4-M1)
   - "Confirm", "model" and "perform" between the markers; `rm` outside them
   - a missing `settings.json`
 - **`test_real_repo_passes`:** every check on the real repo, with the findings in the assertion message. Red until groups C, T and D land.
@@ -497,10 +499,10 @@ jobs:
           python-version: "3.14"
       - name: Sync (locked)
         run: uv sync --locked
-      - name: Tests (seeded regressions + real repo)
-        run: uv run pytest -q
       - name: Ruff
         run: uv run ruff check -q
+      - name: Tests (seeded regressions + real repo)
+        run: uv run pytest -q
 ```
 
 **`.github/dependabot.yml`:**
@@ -512,6 +514,8 @@ updates:
     schedule:
       interval: "weekly"
 ```
+
+Ruff runs before the tests, matching S20, so a red test never hides a lint result (RV4-L2).
 
 ### 5.5 Item 2
 `.claude/settings.json` becomes `{}`. `auto-save-progress.ps1` stays for M.
@@ -534,21 +538,27 @@ On `fix/stage0-quick-wins`, only when the user asks:
 Each commit runs `uv run ruff check -q && uv run pytest -q` (S20). Only `test_real_repo_passes` may be red before the end, and the last commit is fully green.
 
 ### 6.2 PR description (required sections)
-- **Summary:** every item, G*, RV-* and RV2-* fix, each mapped to a commit; links to the three new `changes.md` sections.
+- **Summary:** every item, G*, and RV-* through RV4-* fix, each mapped to a commit; links to the three new `changes.md` sections.
 - **Automated verification:**
   - the `uv run pytest -q` result, plus the test IDs from `uv run pytest --collect-only -q` (S20)
   - ruff clean
-  - the Actions run, plus the pasted `gh run view` / annotations output showing no Node 20 / deprecation annotation
+  - the Actions run, plus the pasted `gh run view` / check-run annotations output. **Pass condition (RV4-M3): no annotation mentions `Node.js 20` or `node20`.** The notice "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026" is **expected** and doesn't fail the check (`runs-on: ubuntu-latest` is kept by user decision)
   - the item-3 VAT grep returning nothing
 - **Manual verification.** The user runs these interactively in the worktree. Each records steps, date, OS/shell, Claude Code version, who ran it, result and cleanup.
-  0. **Precondition (RV3-M2).** Before checks 1 and 3:
+  **Order and isolation (RV4-M4a):** run the checks in the order **0 → 2a → 2b → 1 → 3 → 2 → 4 → 5 → 6**. At the end of every check that touches `$HOME`, remove exactly the fixtures it created (and any learner data it caused, e.g. check 6's progress files), so the next check starts from the precondition state.
+  0. **Precondition (RV3-M2).** Before **every** check that touches `$HOME` (1, 2a, 2b, 3 and 6):
      - Confirm `$HOME/skill-tutor-tutorials`, `$HOME/.claude/commands/learn.md` and `$HOME/.claude/commands/learn` **don't exist**.
      - If any does, move it aside to `$HOME/stage0-manual-check-aside-<ts>/` first, and restore it afterwards.
      - Run the checks from WSL/Linux only. The Windows-side `/mnt/c/Users/…/skill-tutor-tutorials` holds real data and is never touched.
      - Cleanup steps delete only what the check itself created.
   1. **Resume:** fake `progress/lesson-0.1…1.8.md`, `settings.json` and `learner_profile.md` under `~/skill-tutor-tutorials/`. `/learn` offers 2.1, with **no** 🏗️ line.
   2. **Hook error:** two replies in a worktree session. No "hook error" notice.
-  2a. **Version check on a first run (RV3-M1):** with no `~/skill-tutor-tutorials/settings.json`, `/learn setup` reaches step 0.1 (no warning at the current version).
+  2a. **Version check on a first run (RV3-M1):** with no `~/skill-tutor-tutorials/settings.json`, `/learn setup` reaches step 0.1, with no warning at the current version.
+  2b. **Version-check warning branch (RV4-M4b):**
+     - Create a throwaway shim folder with an executable `claude` that prints `2.1.99 (Claude Code)`.
+     - Start Claude Code by its **absolute path** with that folder first on `PATH`, so the session's shell resolves `claude` to the shim.
+     - Run `/learn setup`. Step 0.1 shows the Hebrew warning and then continues. That proves 2.1.99 < 2.1.176 is compared numerically.
+     - Delete the shim folder afterwards.
   3. **Clean-slate:**
      - Hash the main checkout's local settings file first.
      - Fixtures: `~/skill-tutor-tutorials/` (one file), `~/.claude/commands/learn/` (one file), and `~/.claude/commands/learn.md` as a **copy of the worktree's `learn.md`**.
@@ -580,7 +590,7 @@ Each commit runs `uv run ruff check -q && uv run pytest -q` (S20). Only `test_re
 | `resume` offers 2.1 after 1.8 | `course_md` (b) plus manual check 1 |
 | 0.4 splits into slides | `slide_markers` |
 | No hook error after replies | `settings_json` plus manual check 2 |
-| `validate.yml` has no Node deprecation warning | the annotations evidence |
+| `validate.yml` has no Node deprecation warning | the annotations evidence: nothing mentions Node.js 20 / node20; the ubuntu-latest notice is expected (RV4-M3) |
 | The clean-slate step backs up before any delete | S4, `clean_slate_no_delete`, and manual check 3 |
 
 Manual checks 4–6, the VAT grep and `spoken_lesson_refs` cover changes that §3 doesn't name.
@@ -712,3 +722,24 @@ A fresh Opus 5.5 Plan agent (single, read-only, no context) raised 22 findings: 
 | RV3-L10 | `0.1:125` bridge | Known churn (1b) |
 | RV3-L11 | Optional denylist entries | Added (S19) |
 | RV3-L12 | `2.5:97` MCP expansion (1c); S18 rationale selective | 1c's concern; S18 rationale scoped |
+
+### Fourth independent review (2026-09-28)
+A fresh Opus 5.5 Plan agent (single, read-only, no context) raised 15 findings: 1 High, 4 Medium, 10 Low. It re-derived the full spoken-number inventory, the VAT list and every line number independently and found no new content gaps. All were accepted. M2 was resolved as a known, deferred item by user decision.
+
+| # | Finding | Resolution |
+|---|---|---|
+| RV4-H1 | "Named check fails, all others pass" was unsatisfiable: the header seed tripped `spoken_lesson_refs`, and the default allowlist went stale on fixture files | `fixture_checks()` binds `FIXTURE_ALLOWLIST` for every fixture test; the header seed uses an existing but wrong lesson; spoken seeds sit after line 3 |
+| RV4-M1 | Denying "קוד יציאה אחד" would block the required correction | The entry is narrowed to the wrong claim `מחזיר(ה\|ים)? קוד יציאה אחד`; a must-pass case for the correction |
+| RV4-M2 | The docs aren't on `master`, so the Stage 0 worktree lacks the spec | **Deferred (user decision):** a docs PR is merged manually after the spec is locked, before implementation. Reviewers ignore this (§1) |
+| RV4-M3 | "No deprecation annotation" is ambiguous given the ubuntu-latest notice | Pass = no Node.js 20 / node20 annotation; the Ubuntu 26 notice is expected; `ubuntu-latest` kept (user decision) |
+| RV4-M4 | Manual checks shared state; the version-warning branch was never exercised | Fixed order plus per-check cleanup; the precondition applies to every `$HOME` check; new check 2b with a `claude` shim printing 2.1.99 |
+| RV4-L1 | The README fallback misdiagnosed "no leftovers" | Step 0 prints "no leftovers found"; the README fallback is conditioned on `learn.md` existing |
+| RV4-L2 | CI ran pytest before ruff | Ruff first |
+| RV4-L3 | Item 12's `learn.md` edit was undefined | `learn.md:105` wording specified |
+| RV4-L4 | Symlink counts were ambiguous | No-follow counting, a link = one entry |
+| RV4-L5 | Undocumented `CLAUDE_CODE_EXECPATH` | Noted in §3; the documented mechanism is kept |
+| RV4-L6 | `@file` may bypass the Read hook (unverified) | "Ask in words" in step 3; mentioned in the takeaway |
+| RV4-L7 | S18's list of PRs without sections was short | "#1, #5–#11" |
+| RV4-L8 | The PR summary omitted RV3 | "RV-* through RV4-*" |
+| RV4-L9 | The new CONTRIBUTING line sits beside a non-compliant example | Note that F rewrites the example |
+| RV4-L10 | `git ls-files` quoting, and deleted files | `-z`; skip entries missing on disk |
