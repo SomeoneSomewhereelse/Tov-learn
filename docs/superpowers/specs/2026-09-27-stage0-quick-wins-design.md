@@ -1,6 +1,6 @@
 # Stage 0 — Quick-Win PR: Design Spec
 
-**Date:** 2026-09-27 · **Revision:** 6 (2026-09-29), after five independent reviews (§10) · **Status:** **locked** by the user (2026-09-29); next step is writing-plans
+**Date:** 2026-09-27 · **Revision:** 6.1 (2026-09-29), after five independent reviews and the plan review (§10) · **Status:** **locked** by the user (2026-09-29); rev 6.1 is editorial only (no decision changed). Plan: `docs/superpowers/plans/2026-09-29-stage0-quick-wins.md`
 **Parent:** `docs/prds/project-redesign-2026-09-25.md` (the PRD). References such as "D2 item 5", "§3" and "R14" point there. "Review §2.x" points to `docs/reviews/project-review-2026-09-24.md`. "RV-…" through "RV5-…" point to the spec reviews (§10).
 **Baseline:** `master` at `290af75` (= `origin/master`, after #12 and #13 were merged on 2026-09-28). Its tree is identical to the earlier local `d04ca2a` (tree `5bf8edb`), so every line number below refers to that tree.
 **Scope:** Stage 0 only:
@@ -30,7 +30,7 @@
     - The PRD D8b learner CLI must not inherit uv.
     - The repo root carries **no `.python-version`** file, so nothing pins a learner's `python` (RV2-M5). §9 records this for G, S2a and 1c.
 - Edits are minimal and mechanical. Every rewrite stays with its Stage 1 slice.
-- **One-unit-per-file rule (D10).** Stage 0 touches `learn.md` and all 15 `learn/*.md` sub-modules. All 15 get frontmatter. Five also get body edits: `setup.md`, `security.md`, `project.md`, `resume.md`, and a one-line edit to `progress.md` (RV5-L7). `learn.md` gets body edits too. Cited line numbers in `learn/*.md` shift by +3 once the frontmatter lands, so edits are anchored on headings and quoted text, not line numbers alone (RV5-L9). No other unit is open on these files.
+- **One-unit-per-file rule (D10).** Stage 0 touches `learn.md` and all 15 `learn/*.md` sub-modules. All 15 get frontmatter. Five also get body edits: `setup.md`, `security.md`, `project.md`, `resume.md`, and a two-line edit to `progress.md` (RV5-L7). `learn.md` gets body edits too. Cited line numbers in `learn/*.md` shift by +3 once the frontmatter lands, so edits are anchored on headings and quoted text, not line numbers alone (RV5-L9). No other unit is open on these files.
 - **Workspace:**
   - **Baseline guard (RV2-H1, RV3-M6).** Before creating the worktree, run `git fetch origin`, then confirm `git rev-parse master` equals `git rev-parse origin/master`. Then:
     - **If local `master` lags `origin/master` (expected once the docs PR has merged), fast-forward it first:** `git switch master && git merge --ff-only origin/master`. A fast-forward that fails means local `master` has diverged: stop and ask the user (RV5-M4).
@@ -322,8 +322,8 @@ All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n--
    : "${HOME:?HOME is not set}"
    ts=$(date +%Y%m%d-%H%M%S)
    dest="$HOME/skill-tutor-tutorials-backup-$ts"
+   : "${dest:?dest is not set}"
    mkdir "$dest" && mkdir "$dest/commands" || exit 1
-: "${dest:?dest is not set}"
    if [ -e "$HOME/skill-tutor-tutorials" ] || [ -L "$HOME/skill-tutor-tutorials" ]; then mv "$HOME/skill-tutor-tutorials" "$dest/" || exit 1; fi
    if [ -e "$HOME/.claude/commands/learn.md" ] || [ -L "$HOME/.claude/commands/learn.md" ]; then mv "$HOME/.claude/commands/learn.md" "$dest/commands/" || exit 1; fi
    if [ -e "$HOME/.claude/commands/learn" ] || [ -L "$HOME/.claude/commands/learn" ]; then mv "$HOME/.claude/commands/learn" "$dest/commands/" || exit 1; fi
@@ -451,7 +451,7 @@ Written once, as the last commit of group D, appended after the existing section
   - an allowlisted phrase; a spoken reference to an existing lesson
   - "Confirm", "model" and "perform" between the markers; `rm` outside them
   - a missing `settings.json`
-- **`test_real_repo_passes`:** every check on the real repo, with the findings in the assertion message. Red until groups C, T and D land.
+- **`test_real_repo_passes`:** every check on the real repo, with the findings in the assertion message. Red until groups C and T land: it turns green at the T5 (clean-slate) commit, and group D must keep it green.
 
 ### 5.3 Toolchain files
 - **`pyproject.toml`:**
@@ -542,7 +542,7 @@ On `fix/stage0-quick-wins`, only when the user asks:
 Each commit runs `uv run ruff check -q && uv run pytest -q` (S20). Only `test_real_repo_passes` may be red before the end, and the last commit is fully green.
 
 ### 6.2 PR description (required sections)
-- **Summary:** every item, G*, and RV-* through RV4-* fix, each mapped to a commit; links to the three new `changes.md` sections.
+- **Summary:** every item, G*, and RV-* through RV5-* fix, each mapped to a commit; links to the three new `changes.md` sections.
 - **Automated verification:**
   - the `uv run pytest -q` result, plus the test IDs from `uv run pytest --collect-only -q` (S20)
   - ruff clean
@@ -771,3 +771,13 @@ A fresh Opus 5.5 Plan agent (single, read-only, no context; told to ignore the d
 | RV5-L7 | `progress.md` keys on "stop" only | Two trigger lines edited |
 | RV5-L8 | Approval location is version-dependent | "from v2.1.211" |
 | RV5-L9 | Small inconsistencies (CONTRIBUTING wording, done-when mapping, S18 and docs PR, line shifts, lab location) | Each fixed in place |
+
+### Plan review (2026-09-29, rev 6.1)
+A fresh single-agent review of the implementation plan also reported four editorial inconsistencies in this spec. All were fixed in place, and no decision changed. Its plan findings were fixed in the plan.
+
+| # | Finding | Resolution |
+|---|---|---|
+| PR-S1 | §5.2 said `test_real_repo_passes` stays red "until groups C, T and D land", but the tree is clean after T5 | "Red until groups C and T land"; D keeps it green |
+| PR-S2 | §1 called the `progress.md` change "a one-line edit"; §4.1 and §4.3 edit two trigger lines | "a two-line edit" |
+| PR-S3 | In §4.3 item 14's bash reference shape, the `: "${dest:?}"` guard sat after `mkdir` (and was unindented), contradicting the bullet below it | Guard moved to right after `dest` is computed, before `mkdir` |
+| PR-S4 | §6.2's Summary listed fixes "RV-* through RV4-*", omitting RV5 fixes that change behaviour | "RV-* through RV5-*" |
