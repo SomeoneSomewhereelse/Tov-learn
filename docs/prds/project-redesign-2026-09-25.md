@@ -1,6 +1,6 @@
 # Tov-learn — Project Redesign PRD
 
-**Date:** 2026-09-25 · **Revised:** 2026-09-26, after an independent review (§5) · **Status:** decisions agreed in brainstorming; input to per-unit specs
+**Date:** 2026-09-25 · **Revised:** 2026-09-26, after an independent review (§5); **amended** 2026-09-29 by the locked Stage 0 spec (§8) · **Status:** decisions agreed in brainstorming; input to per-unit specs
 **Input:** `docs/reviews/project-review-2026-09-24.md` (multi-persona panel review, 2026-09-24; section refs below as "§2.x")
 **Scope:** the active course `courses/ai-dev/` and the `/learn` tutor. `courses/_archive/` is out of scope throughout.
 
@@ -55,6 +55,8 @@ Stage 0 quick wins → the skills move (M) → Stage 1 content → Stage 2 platf
 *Why:* option A leaves the root causes in place. Option C (2–3 months, big-bang) is too big for this team.
 
 ### D2 — Stage 0: a 16-item quick-win PR
+*Amended by the Stage 0 spec: see §8, items A1–A9.*
+
 The review's 9 items, several tightened, and seven added:
 
 | # | Item | Source |
@@ -250,7 +252,7 @@ The review's 9 items, several tightened, and seven added:
   - The D11 authoring requirement (objectives, keys, rubrics).
   - **The Hebrew style guide (D9b).**
 
-**D7c: CI lints fail on structure, only warn on age, and use a shrinking baseline for existing offenders (R3).**
+**D7c: CI lints fail on structure, only warn on age, and use a shrinking baseline for existing offenders (R3).** *(Amended: §8 A10.)*
 - **Baseline:** F generates, once, a baseline file listing every existing (file, string) pair of **model strings and denylisted wrong facts**. The lint:
   - **fails** on any model string that isn't in `landscape.md` or the baseline, and on any denylist hit that isn't in the baseline, **in any file** (outside `_archive/` and `old_B`)
   - prints baseline hits as warnings
@@ -310,7 +312,7 @@ The review's 9 items, several tightened, and seven added:
 - One mastery constant (8), which the skip-quiz pass mark also uses. Continuous score buckets.
 - Reviews quiz first. Intervals expand on a pass (e.g. 1→3→7→14→30→60 days) and drop back on a fail; the spec sets the exact numbers. Every lesson you finish gets a review date. SM-2/FSRS comes later.
 - No lesson versions, retake mechanism or `schema_version` detection (Assumptions). If a future schema change needs a version field, a missing field can simply mean version 0.
-- The stdlib has no JSON-Schema validator. So the schema documents the format, the CLI does minimal checks itself, and CI does full validation with `jsonschema`, installed only in CI.
+- The stdlib has no JSON-Schema validator. So the schema documents the format, the CLI does minimal checks itself, and CI does full validation with `jsonschema`, installed only in CI. *(Amended: §8 A11.)*
 
 **D8d: the move to `.claude/skills/learn/` is its own small unit, M, straight after Stage 0 (R2).**
 - **Scope is move-only:**
@@ -319,7 +321,7 @@ The review's 9 items, several tightened, and seven added:
   - no dead code carried over (D8a)
   - the CLAUDE.md module table rewritten, with its lint
 - Modules become supporting files, not skills, so the 15 `/learn:*` entry points go away.
-- **Done when:** the Stage 0 reference lint proves every path resolves.
+- **Done when:** the Stage 0 reference lint proves every path resolves. *(Amended: §8 A13; M must first extend the lint to `${CLAUDE_SKILL_DIR}`.)*
 - **In S2a, not M:**
   - `permissions.additionalDirectories` for `~/skill-tutor-tutorials`. `skills.md` confirms it "grants file access only".
     - *UNVERIFIED:* whether it accepts `~` or Windows paths. The S2a spec checks. Fallback: setup writes the absolute path into its owned entries in `settings.local.json`.
@@ -379,7 +381,7 @@ See §3 for the order. **The first spec covers Stage 0 only.** The second covers
 - The D7c baseline is empty.
 - The Windows and macOS run-throughs (D9a) pass.
 
-At the gate, the README tester note (D2 item 13) and the clean-slate step (D2 item 14) are removed. After the gate, the data format is stable, so a fresh install stays valid.
+At the gate, the README tester note (D2 item 13), the clean-slate step (D2 item 14) and its temporary `clean_slate_no_delete` check (§8 A10) are removed. After the gate, the data format is stable, so a fresh install stays valid.
 
 **One-unit-per-file rule (R2).** Each spec lists the tutor files (`.claude/skills/learn/**`) it touches. Only one open unit may touch a given module file at a time. This is a working rule, not a guarantee: for example, S2a rewires `progress.md`/`quiz.md` to the CLI while F changes `quiz.md` to skip optional cards.
 
@@ -406,7 +408,7 @@ At the gate, the README tester note (D2 item 13) and the clean-slate step (D2 it
 
 ## 3. Phased rollout
 
-Order: **0 → M → F → G → 1a → 1d → 1b → 1c → 1e → gate → S3**. After M, S2a–S2d run alongside Stage 1 under the one-unit-per-file rule.
+Order: **0 → M → F → N → G → 1a → 1d → 1b → 1c → 1e → gate → S3** (N added by §8 A12). After M, S2a–S2d run alongside Stage 1 under the one-unit-per-file rule.
 
 | # | Unit | Depends on | Scope | Done when |
 |---|---|---|---|---|
@@ -552,3 +554,25 @@ Checked 2026-09-24 to 2026-09-26. "(reviewer)" marks facts verified by the indep
 - The Desktop terminal's shell on Windows (→ 1a spec).
 - Desktop picking up PATH changes only after a restart (→ G run-through).
 - From review §5: `google-genai` on Python Workers (moot); a plan-level context cap (not relied on); a native-Windows run of the Stop hook (moot, the hook is deleted).
+
+---
+
+## 8. Amendments from the Stage 0 spec (2026-09-29)
+
+The Stage 0 spec (`docs/superpowers/specs/2026-09-27-stage0-quick-wins-design.md`, revision 6, locked 2026-09-29) went through five independent reviews. It changes the decisions below. Where this section and the text above disagree, **this section wins**. The spec holds the detail and the evidence.
+
+| # | Amends | Change |
+|---|---|---|
+| A1 | D2 item 5 | Also: the leaked preambles at `2.3`/`2.6_exercises.md:1`; stale lesson and module cross-references (e.g. `2.1:5`, `2.6:77`, `0.2:137,165`, `0.2_exercises:146-149`, `0.3:57,87`, `0.3_exercises:59`, `1.1:165`); and every spoken lesson number that names a nonexistent lesson (full inventory in the spec, §4.2) |
+| A2 | D2 item 8 | Also `README.md:202`, `CONTRIBUTING.md:61` and `CLAUDE.md:14,75`; the add-a-module docs gain the `disable-model-invocation` frontmatter step |
+| A3 | D2 item 12 | `resume.md` also stops offering the final project until 1e |
+| A4 | D2 item 7 | Aliases: `עצור`/`סיום` = stop, `בוחן`/`בוחן מלא` = quiz me (full), `המשך` = continue. "בחן אותי" stays **diagnostic** (it already was) |
+| A5 | D2 item 14 | "Backs up and deletes" becomes a **move** into a timestamped backup folder, with no delete command. Exact paths only (`~/skill-tutor-tutorials/`, `~/.claude/commands/learn.md`, `~/.claude/commands/learn/`), no `learn*` glob. Global installs from before 2026-05-25 never reach the step, so the README tester note gives a manual fallback |
+| A6 | D2 item 15, D7d | `setup-python` is replaced by `astral-sh/setup-uv` (SHA-pinned, `node24`). The contributor toolchain is **uv + pytest + ruff**, and uv is a hard requirement for contributors only, never for learners. Python is pinned to 3.14 in `pyproject.toml` only, with **no** root `.python-version`. Dependabot is adopted for `github-actions` (resolves the §6 Dependabot row) |
+| A7 | D2 item 16 | Also `1.6_script.txt:33`. The hosted MCP stays **read-only** and project-scoped, and gains the documented `claude /mcp` → Authenticate step. `1.6_exercises.md:103` is rewritten so nothing is written through MCP |
+| A8 | D2 item 10 | A Claude Code floor of **2.1.176**: the hook `if` path matching for `Read(...)` was fixed in 2.1.176 (CHANGELOG). It's stated in the 1.3 exercise and script and in the README, and `/learn setup` warns below it |
+| A9 | D2 item 3 | The "3 files" hold **seven** VAT occurrences (including `vat_rate = 0.17` and a spelled-out "שבעה עשר אחוז"); all seven change to 18% |
+| A10 | D7c | Stage 0 also adds `spoken_lesson_refs` (spoken lesson numbers must name existing lessons, with a stale-checked phrase allowlist), one more denylist entry (`NEXT_PUBLIC_SUPABASE_ANON_KEY`), and the **temporary** `clean_slate_no_delete` check, removed at the gate |
+| A11 | D8c | `jsonschema`, if needed, is a dev-group dependency used only by tests, so contributors install it locally too, not "only in CI" |
+| A12 | D1, D10, §3 | **New unit N (numbering contract)** between F and G/1a: stable lesson ids, a manifest, a deterministic generator for derived numbers with CI `--check`, id references in prose, a thin renumber skill, and a CLAUDE.md "run the generator before any push" rule. It replaces Stage 0's `header_numbers` and `spoken_lesson_refs`. It needs its own spec |
+| A13 | D8d, §3 row M | M's done-when ("the reference lint passes") is vacuous until M extends `tutor_refs` to resolve `${CLAUDE_SKILL_DIR}` against the nearest `SKILL.md`, with seeded tests |
