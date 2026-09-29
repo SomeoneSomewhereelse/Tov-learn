@@ -1,7 +1,7 @@
 # Stage 0 — Quick-Win PR: Design Spec
 
-**Date:** 2026-09-27 · **Revision:** 5 (2026-09-28), after four independent reviews (§10) · **Status:** approved in brainstorming; pending the user's review of revision 5
-**Parent:** `docs/prds/project-redesign-2026-09-25.md` (the PRD). References such as "D2 item 5", "§3" and "R14" point there. "Review §2.x" points to `docs/reviews/project-review-2026-09-24.md`. "RV-…" through "RV4-…" point to the spec reviews (§10).
+**Date:** 2026-09-27 · **Revision:** 6 (2026-09-29), after five independent reviews (§10) · **Status:** **locked** by the user (2026-09-29); next step is writing-plans
+**Parent:** `docs/prds/project-redesign-2026-09-25.md` (the PRD). References such as "D2 item 5", "§3" and "R14" point there. "Review §2.x" points to `docs/reviews/project-review-2026-09-24.md`. "RV-…" through "RV5-…" point to the spec reviews (§10).
 **Baseline:** `master` at `290af75` (= `origin/master`, after #12 and #13 were merged on 2026-09-28). Its tree is identical to the earlier local `d04ca2a` (tree `5bf8edb`), so every line number below refers to that tree.
 **Scope:** Stage 0 only:
 - D2's 16 items
@@ -30,9 +30,10 @@
     - The PRD D8b learner CLI must not inherit uv.
     - The repo root carries **no `.python-version`** file, so nothing pins a learner's `python` (RV2-M5). §9 records this for G, S2a and 1c.
 - Edits are minimal and mechanical. Every rewrite stays with its Stage 1 slice.
-- **One-unit-per-file rule (D10).** Stage 0 touches `learn.md` and all 15 `learn/*.md` sub-modules. All 15 get frontmatter. Four also get body edits: `setup.md`, `security.md`, `project.md` and `resume.md`. `learn.md` gets body edits too. No other unit is open on these files.
+- **One-unit-per-file rule (D10).** Stage 0 touches `learn.md` and all 15 `learn/*.md` sub-modules. All 15 get frontmatter. Five also get body edits: `setup.md`, `security.md`, `project.md`, `resume.md`, and a one-line edit to `progress.md` (RV5-L7). `learn.md` gets body edits too. Cited line numbers in `learn/*.md` shift by +3 once the frontmatter lands, so edits are anchored on headings and quoted text, not line numbers alone (RV5-L9). No other unit is open on these files.
 - **Workspace:**
   - **Baseline guard (RV2-H1, RV3-M6).** Before creating the worktree, run `git fetch origin`, then confirm `git rev-parse master` equals `git rev-parse origin/master`. Then:
+    - **If local `master` lags `origin/master` (expected once the docs PR has merged), fast-forward it first:** `git switch master && git merge --ff-only origin/master`. A fast-forward that fails means local `master` has diverged: stop and ask the user (RV5-M4).
     - If `origin/master` is still `290af750671abf35342fc2c4ee131f0e0db89130`, proceed.
     - Otherwise, proceed only if `git diff --stat 290af75 origin/master -- . ':!docs'` is empty.
     - Otherwise, **stop** and re-verify every cited line against the new tip before editing.
@@ -64,8 +65,8 @@
 | S15 | **Dependabot is adopted now for `github-actions` only**, weekly. The `uv` ecosystem is deferred | Keeps the SHA pins fresh. Dependabot's documented uv version is v0.11 |
 | S16 | **The Supabase MCP stays read-only.** `1.6_exercises.md:103` is rewritten, and the documented `/mcp` → Authenticate step is added (RV-H2, RV2-M3) | A read-only boundary for beginners. The exercise must not fail as written |
 | S17 | **A new check, `spoken_lesson_refs`:** every spelled "W נקודה W" and hyphenated ordinal ("חמישי-שלוש") in course content must name an existing lesson, apart from an explicit phrase allowlist (RV2-M6). It handles one-letter prefixes (ו/ב/ל/ש/ה/מ/כ) and every table form (RV3-H1–H3) | Makes the residue pass complete over every form it parses, and keeps it that way until N replaces it |
-| S18 | **Stage 0's `changes.md` commit also adds the missing sections for #12 and #13** (user decision) | They were merged during this work without `changes.md` entries. Folding them in avoids a direct push to `master` and another conflict-prone edit. Earlier PRs without sections (#1, #5–#11; only `sean_changes` #2 and `yuval_ver` #3 have sections) are left for F's Keep-a-Changelog conversion (RV3-L12, RV4-L7) |
-| S19 | **Two more denylist entries:** `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and the *wrong claim* `מחזיר(ה\|ים)?\s+קוד\s+יציאה\s+אחד` ("returns exit code one", as in `1.3_script.txt:29` "ומחזיר קוד יציאה אחד"). The bare phrase "קוד יציאה אחד" stays legal, so the correction ("exit code one doesn't block") can say it (RV3-L11, RV4-M1) | Stage 0 fixes both occurrences, and review §2.15 A lists both. PRD D2 item 9 allows entries Stage 0 fully fixes |
+| S18 | **Stage 0's `changes.md` commit also adds the missing sections for #12 and #13** (user decision) | They were merged during this work without `changes.md` entries. Folding them in avoids a direct push to `master` and another conflict-prone edit. Earlier PRs without sections (#1, #5–#11; only `sean_changes` #2 and `yuval_ver` #3 have sections) are left for F's Keep-a-Changelog conversion (RV3-L12, RV4-L7). The docs PR (review, PRD, spec, plan) is planning material, not a behaviour change, so it gets no section (RV5-L9) |
+| S19 | **One more denylist entry: `NEXT_PUBLIC_SUPABASE_ANON_KEY`** (RV3-L11). The exit-code phrase was tried twice and **dropped** (RV4-M1, RV5-M1): the wrong claim ("מחזיר קוד יציאה אחד" as a *block*) and the correct explanation ("exit code one does *not* block") share the same words, so no regex separates them. The wrong claim is fixed by hand in item 10; F's full denylist may revisit it with a baseline | Stage 0 fixes the only occurrence (`1.6_exercises.md:21`), and review §2.15 A lists it. PRD D2 item 9 allows entries Stage 0 fully fixes |
 | S20 | **Dev loop:** `uv run ruff check -q && uv run pytest -q` routinely; `uv run pytest -v` when red; `uv run pytest --collect-only -q` for the PR's list of test IDs (RV3-L1, RV3-L6) | Cheap routine runs. Ruff is never skipped by an expected red test. The PR still gets IDs |
 
 ---
@@ -88,7 +89,7 @@ Checked per D7b. "(reviewer)" marks facts verified by a spec review that are not
 | Hook `if` added in **2.1.85**; `Read(.env)`-style path patterns match from **2.1.176** | Confirmed | anthropics/claude-code `CHANGELOG.md` (raw) |
 | Shell-form hooks run with `sh -c` on macOS/Linux, Git Bash on Windows, PowerShell when Git Bash is missing; no controlling terminal; `permissionDecision: "ask"` exists | Confirmed | hooks.md (raw), "Shell form", `shell` field |
 | A bare filename in `Read(…)` matches at any depth; Read deny rules cover `cat`/`head`/`tail` but not `grep -r` or scripts | Confirmed | permissions.md (raw) |
-| A "Yes, and don't ask again" approval is saved to `.claude/settings.local.json`, resolved through worktrees to the main checkout | (reviewer) | permissions.md |
+| A "Yes, and don't ask again" approval is saved to `.claude/settings.local.json`, resolved through worktrees to the main checkout **from v2.1.211**; before that, it was saved in the starting directory | (reviewer; RV5-L8) | permissions.md |
 | Sandbox is OS-enforced; not native Windows | Confirmed | sandboxing.md (raw) |
 | Same-name skills/commands: "personal over project" | Confirmed | skills.md (raw) |
 | Routers before `c25e73c` (2026-05-25), e.g. `1bdbd50`, `acbf16c`, contain setup and the global install **inline**. From `c25e73c` on, the router `Read`s `.claude/commands/learn/setup.md` | Confirmed | `git show <sha>:.claude/commands/learn.md` |
@@ -116,7 +117,7 @@ The last two are listed as untested in the PR (§6).
 | **P: Platform/CI** | 2, 9, 15, S6/S12/S13/S15/S17 | `.github/workflows/validate.yml`, **new** `.github/dependabot.yml`, **new** `pyproject.toml`, **new** `uv.lock`, `.gitignore`, `tests/validate_structure.py`, **new** `tests/test_validate_structure.py`, `.claude/settings.json` |
 | **C: Course content** | 1, 3, 4, 5 (+G1, RV-M1, RV2-M6), 10 (+RV-L2, S14), 16 (+S16, RV-M6) | `COURSE.md`; scripts/exercises in 0.2–0.4, 1.1–1.8, 2.1–2.6 |
 | **B: old_B** | 12 (content part) | `projects.md` → **new** `03-final-project/old_B-document-intelligence.md` |
-| **T: Tutor** | 6, 7, 11, 12 (+G4), 14, S14 setup check | `learn.md`; all 15 `learn/*.md` (frontmatter); body edits in `setup.md`, `security.md`, `project.md`, `resume.md` |
+| **T: Tutor** | 6, 7, 11, 12 (+G4), 14, S14 setup check | `learn.md`; all 15 `learn/*.md` (frontmatter); body edits in `setup.md`, `security.md`, `project.md`, `resume.md`; two trigger lines in `progress.md` |
 | **D: Docs** | 8 (+G2), 13, test command, S11, S14, S18, RV-L6, RV3-M7 | `setup.md` §F, `README.md`, `CLAUDE.md`, `CONTRIBUTING.md` (lines 13–35, 57–61 and 65–69 only), `changes.md` |
 
 ### 4.2 Course content (groups C and B)
@@ -269,6 +270,7 @@ All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n--
   - `quiz me full / בוחן מלא` → `quiz.md` in **`quiz me full`** mode
   - `stop / עצור / סיום`
 - **`learn.md` Route table (79–80):** the same words, naming the `quiz.md` mode. `quiz.md`'s **body** is untouched (it gets only item 11's frontmatter); it's F's (RV3-L3).
+- **`progress.md` (RV5-L7):** the two trigger mentions, `:3` ("on the \"stop\" command") and `:99` ("## Session End (on \"stop\" command)"), name `stop / עצור / סיום`, so the Hebrew stop reaches the session-end section. Nothing else in `progress.md` changes.
 - `teaching.md:144` and `setup.md:225` are unchanged.
 
 #### Item 12 + G4: no capstones until 1e
@@ -309,7 +311,7 @@ All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n--
    - `$HOME/.claude/commands/learn/`
 
    Relative paths are forbidden, because the repo has its own `skill-tutor-tutorials/`. If none exists, print one Hebrew line ("no leftovers from an earlier install were found") and continue to 0.1 (RV4-L1).
-2. **Show.** Each path found, with its file count and newest modification date. Counts **never follow symlinks**: a symlink counts as one entry, and its target is shown next to it (RV2-L11, RV4-L4).
+2. **Show.** Each path found, with its file count and newest modification date. Counts **never follow symlinks**: a symlink counts as one entry, and its target is shown next to it (RV2-L11, RV4-L4). The bash variant uses only **portable** commands that work on both GNU (Linux/WSL) and BSD (macOS) userlands, e.g. `find "$p" | wc -l` (no `-L`, no `-printf`) and `ls -ld`; never `stat -c` or `find -printf` (RV5-L3).
 3. **Ask.** One `AskUserQuestion`, in Hebrew:
    - `להשאיר הכל` (listed first): nothing is touched.
    - `להעביר לגיבוי ולהתחיל מחדש`: everything moves to `~/skill-tutor-tutorials-backup-<date>`; nothing is lost.
@@ -321,11 +323,13 @@ All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n--
    ts=$(date +%Y%m%d-%H%M%S)
    dest="$HOME/skill-tutor-tutorials-backup-$ts"
    mkdir "$dest" && mkdir "$dest/commands" || exit 1
+: "${dest:?dest is not set}"
    if [ -e "$HOME/skill-tutor-tutorials" ] || [ -L "$HOME/skill-tutor-tutorials" ]; then mv "$HOME/skill-tutor-tutorials" "$dest/" || exit 1; fi
    if [ -e "$HOME/.claude/commands/learn.md" ] || [ -L "$HOME/.claude/commands/learn.md" ]; then mv "$HOME/.claude/commands/learn.md" "$dest/commands/" || exit 1; fi
    if [ -e "$HOME/.claude/commands/learn" ] || [ -L "$HOME/.claude/commands/learn" ]; then mv "$HOME/.claude/commands/learn" "$dest/commands/" || exit 1; fi
    ```
-   - `mv` moves a symlink as a link and never follows it. PowerShell uses `Move-Item -LiteralPath … -ErrorAction Stop`, after checking `$HOME` is non-empty.
+   - **The whole move runs as one single Bash (or PowerShell) tool invocation**, never split across calls, because shell variables don't survive between tool calls. The block guards `: "${dest:?}"` right after computing `dest`, before the first `mv` (RV5-M5).
+   - `mv` moves a symlink as a link and never follows it. PowerShell uses `Move-Item -LiteralPath … -ErrorAction Stop`, after checking `$HOME` and `$dest` are non-empty.
    - On any error: stop and report. Never retry with force, and never delete.
    - **Across filesystems (RV3-M4).** If a source sits on another filesystem (e.g. `~/.claude/commands` symlinked to `/mnt/c/…`), `mv` copies and then removes the original. An interruption leaves the original intact, or both copies, but never neither. The step claims "nothing is lost", not "nothing is unlinked".
 5. **Verify and report.** Each original path is gone and present in the backup. The backup's **entry counts, taken the same no-follow way, equal the counts shown in step 2** (RV3-M4, RV4-L4). Print the backup path.
@@ -379,7 +383,7 @@ The "add a module" steps in `README.md:196-202`, `CONTRIBUTING.md:57-61` and CLA
 - **`CONTRIBUTING.md` "Pull Requests" (`:65-69`):** add one line, "run `uv run ruff check -q && uv run pytest -q` before opening a PR" (RV3-L2).
 
 #### RV3-M7: document what CI now enforces, and the aliases
-- **`CONTRIBUTING.md` "Adding a Lesson" (`:13-35`):** one line. CI requires ≥ 5 `[מעבר שקף]` markers per script, an exercise H1 with `שיעור X.Y` and a matching `**שיעור:**` line, a `COURSE.md` row with a correct module range, and spoken lesson references that name existing lessons. "See `tests/validate_structure.py`. The example below predates these rules; F rewrites it." (RV4-L9)
+- **`CONTRIBUTING.md` "Adding a Lesson" (`:13-35`):** one line. CI requires ≥ 5 `[מעבר שקף]` markers per script, an exercise H1 with `שיעור X.Y` (and, where present, a matching `**שיעור:**` line), a `COURSE.md` row with a correct module range, and spoken lesson references that name existing lessons. "See `tests/validate_structure.py`. The example below predates these rules; F rewrites it." (RV4-L9)
 - **`README.md` command table (`:113-124`) and `:72`:** add the Hebrew aliases: `continue / המשך`, `quiz me / בוחן`, `stop / עצור / סיום`.
 
 #### `changes.md` (S11, S18)
@@ -397,7 +401,7 @@ Written once, as the last commit of group D, appended after the existing section
 - A `CHECKS` tuple lists them all. No `main()`, no printing, no import-time work.
 - **Course scope:** `courses/*/` except `courses/_archive/`, skipping `old_B*` files.
 - **File discovery (RV2-L8):** a helper `repo_files(root, pattern)`:
-  - uses `git ls-files -z` when `root/.git` exists, so local results match CI, and non-ASCII paths come out unquoted. Entries missing on disk (deleted in the working tree) are skipped (RV4-L10)
+  - uses `git ls-files -z` when `root/.git` exists, **as a file or a directory** (in a worktree `.git` is a file; RV5-L4), so local results match CI, and non-ASCII paths come out unquoted. Entries missing on disk (deleted in the working tree) are skipped (RV4-L10)
   - otherwise walks the filesystem (the pytest fixture trees)
 
 | Check | Rule |
@@ -406,11 +410,11 @@ Written once, as the last commit of group D, appended after the existing section
 | `slide_markers` | Every `*_script.txt` has ≥ 5 `[מעבר שקף]` and zero `[SLIDE TRANSITION]` |
 | `header_numbers` | **Exercises:** the first `# ` heading contains `שיעור X.Y`, and any `**שיעור:**` line contains `X.Y`, both equal to the folder.<br>**Scripts:** in the first 3 non-empty lines, every `(שיעור\|Lesson)\s+(\d+\.\d+)` and every `שיעור\s+([א-ת]+)\s+נקודה\s+([א-ת]+)` equals the folder. `W` is `[א-ת]+`, mapped by the digit-word table (אפס; אחת/אחד; שתיים/שניים/שתים; שלוש/שלושה; ארבע/ארבעה; חמש/חמישה; שש/שישה; שבע/שבעה; שמונה; תשע/תשעה); an unmapped word is a finding |
 | `spoken_lesson_refs` (S17) | Signature `check_spoken_lesson_refs(root, allowlist=SPOKEN_ALLOWLIST)`, so tests pass their own allowlist (RV3-H3).<br>In every course-scope `*_script.txt` and `*_exercises.md`:<br>(a) every match of `(?<![א-ת])([א-ת]+)\s+נקודה\s+([א-ת]+)` whose words map through the digit-word table, after stripping **at most one** leading prefix letter from `ובלשהמכ` if the bare word isn't in the table, must form an `X.Y` that's an **existing lesson folder number** in that course<br>(b) every hyphenated ordinal `(ראשון|שני|שלישי|רביעי|חמישי|שישי|שביעי|שמיני)-([א-ת]+)`, mapped to X and Y the same way, must likewise name an existing lesson<br>A match inside an allowlisted phrase is skipped. `SPOKEN_ALLOWLIST` is a tuple of (file-name glob, exact phrase), seeded from §4.2's stay list:<br>• `0.3_script.txt`, "ושבע נקודה אחת אחוז"<br>• `1.1_script.txt`, "ארבע נקודה שש" and "שש נקודה שש מיליארד"<br>• `1.5_script.txt`, "שישה נקודה שישה מיליארד"<br>• `2.1_script.txt`, "שתיים נקודה אפס"<br>• `2.5_script.txt`, "שלוש נקודה שלוש עשרה", "שלוש נקודה ארבע עשרה" and "ארבע נקודה שבע"<br>**Stale entry (a finding):** the glob matches at least one course-scope file, and the exact phrase occurs in none of them (RV3-H3). N replaces this check |
-| `course_name_denylist` | No `קורס\s+(ה-)?AI Engineer`, `\*\*קורס:\*\*\s*AI Engineer` or `AI Engineer course` (case-insensitive) in course scope. The job title passes. **Plus (S19):** `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `מחזיר(ה\|ים)?\s+קוד\s+יציאה\s+אחד`. The check keeps its name, since F renames it into the full denylist |
+| `course_name_denylist` | No `קורס\s+(ה-)?AI Engineer`, `\*\*קורס:\*\*\s*AI Engineer` or `AI Engineer course` (case-insensitive) in course scope. The job title passes. **Plus (S19):** `NEXT_PUBLIC_SUPABASE_ANON_KEY`. The check keeps its name, since F renames it into the full denylist |
 | `tutor_refs` | In `.claude/**/*.md`:<br>(a) backticked paths starting with `.claude/` or `courses/` exist, except `LOCAL_ONLY = {".claude/settings.local.json"}`<br>(b) a backticked bare `name.md` directly after a word-bounded `Read`/`Load` (any case) exists in the referring file's folder<br>Skips `~/…` and placeholders (`[`, `{`, `*`, `X.Y`). **`${CLAUDE_SKILL_DIR}` resolution is M's extension (§9; RV2-M4)** |
 | `settings_json` | `.claude/settings.json`, if present, parses, and contains no `powershell` (case-insensitive) |
 | `relative_links` | In every tracked `*.md`, after removing fenced blocks and inline code spans, every `[text](target)` that isn't `http:`/`https:`/`mailto:`/`#…` resolves (after stripping `#fragment`). Skips `_archive/` and `old_B*` |
-| `clean_slate_no_delete` | *Temporary.* Between the CLEAN-SLATE markers in `setup.md`: no `\brm\b`, `\brmdir\b`, `\bdel\b`, `\berase\b`, `\brd\b`, `\bri\b`, `Remove-Item`, `\bunlink\b`, `-delete\b`, `rmtree`. **Both markers must be present in `setup.md`; a missing marker is a finding** (RV3-M5). The check is deleted together with the section at the gate |
+| `clean_slate_no_delete` | *Temporary.* Between the CLEAN-SLATE markers in `setup.md`, matched **case-insensitively** (PowerShell ignores case; RV5-L2): no `\brm\b`, `\brmdir\b`, `\bdel\b`, `\berase\b`, `\brd\b`, `\bri\b`, `Remove-Item`, `\bunlink\b`, `-delete\b`, `rmtree`, `::Delete\(`. **Both markers must be present in `setup.md`; a missing marker is a finding** (RV3-M5). The check is deleted together with the section at the gate |
 | `lesson_files` *(existing)* | Every lesson folder has `*_script.txt` and `*_exercises.md`; course-scoped |
 | `teaching_step5` *(existing)* | `teaching.md` contains "Step 5" |
 
@@ -430,11 +434,11 @@ Written once, as the last commit of group D, appended after the existing section
   - `slide_markers`: 4 markers; `[SLIDE TRANSITION]`
   - `header_numbers`: `שיעור 5.1` in 2.1; a mismatched `**שיעור:**`; `שיעור 0.1` in 0.2; spelled "שיעור אפס נקודה אחת" in the 2.1 script (an existing but wrong lesson, so `spoken_lesson_refs` stays green, RV4-H1); an unmapped word
   - `spoken_lesson_refs`: "שלוש נקודה שתיים" (no lesson 3.2); prefixed "ושלוש נקודה חמש"; a gendered form "שישה נקודה שבעה"; a hyphenated "חמישי-ארבע"; a stale allowlist entry (the fixture's own allowlist names a phrase absent from its file)
-  - `course_name_denylist`: `בקורס AI Engineer`; `- **קורס:** AI Engineer`; `NEXT_PUBLIC_SUPABASE_ANON_KEY`; `ומחזיר קוד יציאה אחד`
+  - `course_name_denylist`: `בקורס AI Engineer`; `- **קורס:** AI Engineer`; `NEXT_PUBLIC_SUPABASE_ANON_KEY`
   - `tutor_refs`: a missing `.claude/…` route; `Read \`missing.md\``
   - `settings_json`: `powershell`; invalid JSON
   - `relative_links`: a missing target
-  - `clean_slate_no_delete`: `rm -rf`; `Remove-Item`; the END marker missing
+  - `clean_slate_no_delete`: `rm -rf`; `Remove-Item`; lower-case `remove-item`; `[IO.Directory]::Delete(`; the END marker missing
   - `lesson_files`: missing exercises
   - `teaching_step5`: "Step 5" removed
 - **Must-pass negatives,** parametrized:
@@ -444,7 +448,7 @@ Written once, as the last commit of group D, appended after the existing section
   - "already … `x.md`"; "load … from `projects.md`"
   - `http(s)` and `#anchor` links; a broken link in a code fence and in inline code
   - spelled numbers followed by `,` `:` `.`
-  - an allowlisted phrase; a spoken reference to an existing lesson; the correct sentence "קוד יציאה אחד לא חוסם" (RV4-M1)
+  - an allowlisted phrase; a spoken reference to an existing lesson
   - "Confirm", "model" and "perform" between the markers; `rm` outside them
   - a missing `settings.json`
 - **`test_real_repo_passes`:** every check on the real repo, with the findings in the assertion message. Red until groups C, T and D land.
@@ -533,7 +537,7 @@ On `fix/stage0-quick-wins`, only when the user asks:
 2. **P2:** `settings.json` → `{}`.
 3. **C:** COURSE.md → VAT → 0.4 markers → residue → 1.3 → 1.6 → old_B, one commit each.
 4. **T:** frontmatter → aliases → project/resume → security → clean-slate → version check.
-5. **D:** global install → frontmatter docs → tester note → version floor → test command → `changes.md` (last).
+5. **D:** global install → frontmatter docs → tester note → version floor → test command → CI-rules line + README aliases (RV3-M7; RV5-L5) → `changes.md` (last).
 
 Each commit runs `uv run ruff check -q && uv run pytest -q` (S20). Only `test_real_repo_passes` may be red before the end, and the last commit is fully green.
 
@@ -544,9 +548,10 @@ Each commit runs `uv run ruff check -q && uv run pytest -q` (S20). Only `test_re
   - ruff clean
   - the Actions run, plus the pasted `gh run view` / check-run annotations output. **Pass condition (RV4-M3): no annotation mentions `Node.js 20` or `node20`.** The notice "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026" is **expected** and doesn't fail the check (`runs-on: ubuntu-latest` is kept by user decision)
   - the item-3 VAT grep returning nothing
+  - two more greps (RV5-L6): all 15 `.claude/commands/learn/*.md` start with the `disable-model-invocation: true` block (`for f in .claude/commands/learn/*.md; do head -3 "$f"; done`), and `grep -n "Global Install" .claude/commands/learn/setup.md` returns nothing
 - **Manual verification.** The user runs these interactively in the worktree. Each records steps, date, OS/shell, Claude Code version, who ran it, result and cleanup.
   **Order and isolation (RV4-M4a):** run the checks in the order **0 → 2a → 2b → 1 → 3 → 2 → 4 → 5 → 6**. At the end of every check that touches `$HOME`, remove exactly the fixtures it created (and any learner data it caused, e.g. check 6's progress files), so the next check starts from the precondition state.
-  0. **Precondition (RV3-M2).** Before **every** check that touches `$HOME` (1, 2a, 2b, 3 and 6):
+  0. **Precondition (RV3-M2).** Before **every** check that touches `$HOME` (1, 2a, 2b, 3, 5 and 6; RV5-M3):
      - Confirm `$HOME/skill-tutor-tutorials`, `$HOME/.claude/commands/learn.md` and `$HOME/.claude/commands/learn` **don't exist**.
      - If any does, move it aside to `$HOME/stage0-manual-check-aside-<ts>/` first, and restore it afterwards.
      - Run the checks from WSL/Linux only. The Windows-side `/mnt/c/Users/…/skill-tutor-tutorials` holds real data and is never touched.
@@ -554,30 +559,32 @@ Each commit runs `uv run ruff check -q && uv run pytest -q` (S20). Only `test_re
   1. **Resume:** fake `progress/lesson-0.1…1.8.md`, `settings.json` and `learner_profile.md` under `~/skill-tutor-tutorials/`. `/learn` offers 2.1, with **no** 🏗️ line.
   2. **Hook error:** two replies in a worktree session. No "hook error" notice.
   2a. **Version check on a first run (RV3-M1):** with no `~/skill-tutor-tutorials/settings.json`, `/learn setup` reaches step 0.1, with no warning at the current version.
-  2b. **Version-check warning branch (RV4-M4b):**
-     - Create a throwaway shim folder with an executable `claude` that prints `2.1.99 (Claude Code)`.
-     - Start Claude Code by its **absolute path** with that folder first on `PATH`, so the session's shell resolves `claude` to the shim.
-     - Run `/learn setup`. Step 0.1 shows the Hebrew warning and then continues. That proves 2.1.99 < 2.1.176 is compared numerically.
-     - Delete the shim folder afterwards.
+  2b. **Version-check warning branch (RV4-M4b, RV5-M2):**
+     - A PATH shim doesn't work on this machine: `~/.bashrc:118` and `~/.profile:26` put `~/.local/bin` first again in every tool shell.
+     - Instead, temporarily change the floor in the worktree's `setup.md` step 0.1 from `2.1.176` to **`2.1.1000`**. It's numerically above the installed version (e.g. 2.1.283) but sorts *below* it as text.
+     - Run `/learn setup`. Step 0.1 shows the Hebrew warning and then continues. That proves the comparison is numeric.
+     - Restore it with `git checkout -- .claude/commands/learn/setup.md`, and confirm `git diff` is empty.
   3. **Clean-slate:**
      - Hash the main checkout's local settings file first.
      - Fixtures: `~/skill-tutor-tutorials/` (one file), `~/.claude/commands/learn/` (one file), and `~/.claude/commands/learn.md` as a **copy of the worktree's `learn.md`**.
      - Run `/learn setup`. The step-0 prompt appears.
-     - Keep → nothing moved.
+     - Keep → nothing moved. **Abort setup right after answering the step-0 prompt** (Esc), so no `settings.json` or `learner_profile.md` is written into the fixture folder (RV5-L1).
      - Rerun, move → all three are in the backup, originals gone, `git status` clean, restart message shown, no local settings file created in the worktree.
      - **At every permission prompt, answer "Yes" (once), never "Yes, and don't ask again"**, which would write an approval into the hashed file (RV2-L1). The hash must then be unchanged. Record the prompts.
      - Remove the backup only after confirming it contains nothing but the fixtures.
-  4. **1.3 exercise 5** (Linux/bash): steps 1–5 in a throwaway lab. Record the step-5 outcome.
-  5. **Security gate:** `/learn security https://example.com` → "no". No `curl` runs, and the module ends.
-  6. **Aliases and project:**
+  4. **1.3 exercise 5** (Linux/bash): steps 1–5 in a throwaway lab created **outside the repo** (e.g. `~/stage0-lab-<ts>/`), so no repo `CLAUDE.md` or settings load (RV5-L9). Record the step-5 outcome.
+  5. **Security gate:** first create fixture `~/skill-tutor-tutorials/settings.json` and `learner_profile.md` (as in check 1), so `/learn` doesn't route into setup. Then `/learn security https://example.com` → "no". No `curl` runs, and the module ends. Remove the fixtures (RV5-M3).
+  6. **Aliases and project:** create the same fixtures, then start `/learn 0.1` (RV5-M3):
      - `בוחן` starts a quiz.
      - `עצור` saves progress.
      - `בחן אותי` still switches to **diagnostic** mode (RV2-L12).
      - `/learn project` shows the rebuilt message.
+     - Afterwards, remove the fixtures and any progress/tutorial files the session wrote.
 - **Untested (stated explicitly):**
   - the native-PowerShell hook variant
   - the 1.6 MCP add + Authenticate flow, unless a contributor with a Supabase project runs it
   - the version check on Desktop-bundled installs (it skips), and the PATH-binary limitation (RV3-L4)
+  - the **bash variant on macOS** (portable commands required, but only run on Linux/WSL; RV5-L3)
   - the **PowerShell variant of the clean-slate move** (RV3-M3). It follows the bash variant's rules and is lint-checked for delete verbs, but has never run on Windows
 - **Future concerns:** §9.
 - **Reviewer note:** Hebrew changes need a Hebrew-speaking contributor's approval.
@@ -587,7 +594,7 @@ Each commit runs `uv run ruff check -q && uv run pytest -q` (S20). Only `test_re
 | Done when | Proof |
 |---|---|
 | Each new lint fails on a seeded regression and passes on the fixed tree | §5.2, `test_real_repo_passes`, and the P1 message |
-| `resume` offers 2.1 after 1.8 | `course_md` (b) plus manual check 1 |
+| `resume` offers 2.1 after 1.8 | `course_md` (a) rows = folders, and (b) order; plus manual check 1 (RV5-L9) |
 | 0.4 splits into slides | `slide_markers` |
 | No hook error after replies | `settings_json` plus manual check 2 |
 | `validate.yml` has no Node deprecation warning | the annotations evidence: nothing mentions Node.js 20 / node20; the ubuntu-latest notice is expected (RV4-M3) |
@@ -613,7 +620,7 @@ Manual checks 4–6, the VAT grep and `spoken_lesson_refs` cover changes that §
 
 ## 8. Proposed PRD amendments
 
-To be applied in a separate, approved edit:
+**Applied to the PRD on the docs branch on 2026-09-29, before the docs PR** (RV5-L5; user-approved), as the PRD's new "§8 Amendments from the Stage 0 spec" plus inline pointers:
 1. **D2 item 5:** G1 preambles; the RV-M1 cross-references; the full spoken-number inventory (RV2-M6).
 2. **D2 item 8:** G2 locations; the frontmatter step in the add-a-module docs.
 3. **D2 item 12:** `resume.md` too (G4).
@@ -623,10 +630,11 @@ To be applied in a separate, approved edit:
 7. **D2 item 16:** `1.6_script.txt:33`; the read-only MCP with the `/mcp` Authenticate step; the `:103` rewrite.
 8. **D2 item 10:** the Claude Code floor 2.1.176 (S14), in `1.3_exercises.md:8`, `1.3_script.txt:15` and README; the CHANGELOG facts go into §7.
 9. **D2 item 3:** seven VAT occurrences.
-10. **D7c:** Stage 0 also adds `spoken_lesson_refs` (S17), with its stale-allowlist rule, and two denylist entries (S19).
+10. **D7c:** Stage 0 also adds `spoken_lesson_refs` (S17), with its stale-allowlist rule; one denylist entry (S19); and the **temporary** `clean_slate_no_delete` check, which the gate removes together with the CLEAN-SLATE section (D10 gate list) (RV5-L5).
 10a. **D8c:** `jsonschema` would be a dev-group dependency, installed locally as well as in CI (RV3-L8).
 11. **§6 Dependabot row:** decided (S15).
 12. **New unit N** between F and 1a (S10).
+13. **D8d / §3 row M:** M's done-when ("the reference lint passes") is vacuous until M extends `tutor_refs` to resolve `${CLAUDE_SKILL_DIR}` (§9) (RV5-L5).
 
 ---
 
@@ -743,3 +751,23 @@ A fresh Opus 5.5 Plan agent (single, read-only, no context) raised 15 findings: 
 | RV4-L8 | The PR summary omitted RV3 | "RV-* through RV4-*" |
 | RV4-L9 | The new CONTRIBUTING line sits beside a non-compliant example | Note that F rewrites the example |
 | RV4-L10 | `git ls-files` quoting, and deleted files | `-z`; skip entries missing on disk |
+
+### Fifth independent review (2026-09-29)
+A fresh Opus 5.5 Plan agent (single, read-only, no context; told to ignore the deferred docs-on-`master` item) raised 14 findings: **0 High**, 5 Medium, 9 Low. It re-derived the inventories, pins and line numbers and found no content gaps. All recommendations were accepted, and the user locked the spec.
+
+| # | Finding | Resolution |
+|---|---|---|
+| RV5-M1 | The narrowed exit-code regex still matched the natural correction | Entry **dropped** (S19); only `NEXT_PUBLIC_SUPABASE_ANON_KEY` is added |
+| RV5-M2 | The PATH shim is shadowed (`~/.bashrc:118`, `~/.profile:26`) | Check 2b uses a temporary floor of `2.1.1000` in the worktree's `setup.md`, then `git checkout` |
+| RV5-M3 | Checks 5 and 6 routed into setup and weren't isolated | Both get fixtures, are in the `$HOME` list, and clean up; check 6 starts `/learn 0.1` |
+| RV5-M4 | No remedy when local `master` lags | `git merge --ff-only origin/master`; stop if it diverges |
+| RV5-M5 | The move split across tool calls would lose `$dest` | One invocation; `: "${dest:?}"` guard |
+| RV5-L1 | The Keep run wrote setup files into the fixtures | Abort after the step-0 answer |
+| RV5-L2 | Delete-verb match was case-sensitive | Case-insensitive; `::Delete(` added |
+| RV5-L3 | macOS bash variant untested; GNU-only commands | Portable commands required; listed untested |
+| RV5-L4 | `.git` is a file in a worktree | "file or directory" |
+| RV5-L5 | RV3-M7 had no commit slot; two amendments missing; amendment timing | Commit slot; amendments 10 and 13; applied to the PRD before the docs PR |
+| RV5-L6 | Frontmatter and global-install removal had no check | Two greps in the PR evidence |
+| RV5-L7 | `progress.md` keys on "stop" only | Two trigger lines edited |
+| RV5-L8 | Approval location is version-dependent | "from v2.1.211" |
+| RV5-L9 | Small inconsistencies (CONTRIBUTING wording, done-when mapping, S18 and docs PR, line shifts, lab location) | Each fixed in place |
