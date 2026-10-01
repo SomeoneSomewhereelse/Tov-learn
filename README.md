@@ -6,6 +6,10 @@
 
 # Tov-learn
 
+<!-- TEMPORARY: remove at first-cohort gate (PRD D10) -->
+> **Testers: fresh install only.** Before testing, delete `~/skill-tutor-tutorials/` (`%USERPROFILE%\skill-tutor-tutorials` on Windows) and any old global install at `~/.claude/commands/learn.md` and `~/.claude/commands/learn/` — or run `/learn setup`, which offers to move them into a backup for you. **If `~/.claude/commands/learn.md` exists and `/learn setup` doesn't offer to move it, you have an older global install: move or delete `~/.claude/commands/learn.md` and `~/.claude/commands/learn/` by hand, then restart Claude Code.**
+<!-- /TEMPORARY -->
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Built for Claude Code](https://img.shields.io/badge/Built%20for-Claude%20Code-blueviolet)](https://claude.ai/code)
 [![Spaced Repetition](https://img.shields.io/badge/Learning-Spaced%20Repetition-green)](https://en.wikipedia.org/wiki/Spaced_repetition)
