@@ -14,7 +14,7 @@
 
 ## Post-implementation amendments (rev 6.2, 2026-10-01)
 
-The plan was executed inline, then a fresh Opus 5.5 reviewer read the whole branch (Task 23 Step 4). The user approved fixing the findings, as separate commits after the 22 plan commits. The branch was reviewed twice: the first review's findings are the rows below up to L10, and a second review of the fixed branch added rows SR-M1 to SR-L6. The task text below is otherwise unchanged and describes the original run. Where it disagrees with this section, this section wins:
+The plan was executed inline, then a fresh Opus 5.5 reviewer read the whole branch (Task 23 Step 4). The user approved fixing the findings, as separate commits after the 22 plan commits. The branch was reviewed twice: the first review's findings are the rows below up to L10, a second review of the fixed branch added rows SR-M1 to SR-L6, and a third added rows TR-L1 to TR-L10. The task text below is otherwise unchanged and describes the original run. Where it disagrees with this section, this section wins:
 
 | Finding | Fix | Where |
 |---|---|---|
@@ -34,9 +34,16 @@ The plan was executed inline, then a fresh Opus 5.5 reviewer read the whole bran
 | SR-L1, L2 | The commit count and the "revision 6.1" citation in this file were wrong | this section, the header |
 | SR-L3, L4 | PowerShell `Test-InRepo`: no longer fails without `git` (Get-Command and try/catch), and its prefix test ends in a path separator | `setup.md` |
 | SR-L6 | `repo_files` also walks when `git ls-files` itself fails (corrupt `.git`, dubious ownership) | validator, tests |
+| TR-L1 | The bash clean-slate blocks have never run under Git Bash on Windows (path forms, junctions, case). Added to the spec's untested list | spec §6.2 |
+| TR-L2 | The gate removes the `test_clean_slate_*` tests too | spec §9 |
+| TR-L3, L4, L5 | `changes.md` entries 6, 7, 9 and 13 corrected or extended | `changes.md` |
+| TR-L8 | Every git call in the git-tree tests ignores the global and system git config | tests |
+| TR-L10 | The 1.6 dummy row says to set `accountant_id` | content |
+| TR-L6 | Spec header: four content items | spec |
 | SR-L5, L7 | Not fixed, by decision. L5: the guard uses `--show-toplevel`, as the spec says, so a linked worktree's main checkout isn't covered (contributors only). L7: three validator gaps (a module row with no backticked folder, a lesson folder without the `X.Y-` prefix, `<…>` link targets with spaces) don't affect the tree | none |
+| TR-L7, L9, nits | Not fixed, by decision: `relative_links` skips the outer target of an image link; two silent fallbacks match the spec as written; the `"בוחן"` / `"בוחן מלא"` order and an empty backup folder are harmless | none |
 
-**What changes in the numbers.** The code blocks in Tasks 1 and 14 are the first-run versions. The finished branch has 67 tests, not 58: three clean-slate behavioural tests, `root-absolute-link`, `root-absolute-missing` and the missing-git fallback (first review), then two more clean-slate cases (a folder that contains the repo, for Step 1 and Step 3) and the broken-git fallback (second review). Every "58" below is the original run's count; the final evidence is `67 passed`, ruff silent, `0 finding(s)`. The branch is the 22 plan commits plus the review-fix commits; `git log --oneline master..HEAD` is the count. Manual check 3 is unchanged: `test_clean_slate_move_leaves_the_repo_alone` covers the symlink case without touching the user's `$HOME`.
+**What changes in the numbers.** The code blocks in Tasks 1 and 14 are the first-run versions. The finished branch has 67 tests, not 58: three clean-slate behavioural tests, `root-absolute-link`, `root-absolute-missing` and the missing-git fallback (first review), then two more clean-slate cases (a folder that contains the repo, for Step 1 and Step 3) and the broken-git fallback (second review). The third review added no tests. Every "58" below is the original run's count; the final evidence is `67 passed`, ruff silent, `0 finding(s)`. The branch is the 22 plan commits plus the review-fix commits; `git log --oneline master..HEAD` is the count. Manual check 3 is unchanged: `test_clean_slate_move_leaves_the_repo_alone` covers the symlink case without touching the user's `$HOME`.
 
 ## Global Constraints
 

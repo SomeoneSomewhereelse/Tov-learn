@@ -1,6 +1,6 @@
 # Stage 0 — Quick-Win PR: Design Spec
 
-**Date:** 2026-09-27 · **Revision:** 6.2 (2026-10-01), after five independent reviews, the plan review and the final branch review (§10) · **Status:** **locked** by the user (2026-09-29); rev 6.1 is editorial only (no decision changed). Rev 6.2 records the fixes from the final branch review (§10); it changes S5's guard, two lint rules and three content items. Plan: `docs/superpowers/plans/2026-09-29-stage0-quick-wins.md`
+**Date:** 2026-09-27 · **Revision:** 6.2 (2026-10-01), after five independent reviews, the plan review and the final branch review (§10) · **Status:** **locked** by the user (2026-09-29); rev 6.1 is editorial only (no decision changed). Rev 6.2 records the fixes from the final branch review (§10); it changes S5's guard, two lint rules and four content items. Plan: `docs/superpowers/plans/2026-09-29-stage0-quick-wins.md`
 **Parent:** `docs/prds/project-redesign-2026-09-25.md` (the PRD). References such as "D2 item 5", "§3" and "R14" point there. "Review §2.x" points to `docs/reviews/project-review-2026-09-24.md`. "RV-…" through "RV5-…" point to the spec reviews (§10).
 **Baseline:** `master` at `290af75` (= `origin/master`, after #12 and #13 were merged on 2026-09-28). Its tree is identical to the earlier local `d04ca2a` (tree `5bf8edb`), so every line number below refers to that tree.
 **Scope:** Stage 0 only:
@@ -588,6 +588,7 @@ Each commit runs `uv run ruff check -q && uv run pytest -q` (S20). Only `test_re
   - the 1.6 MCP add + Authenticate flow, unless a contributor with a Supabase project runs it
   - the version check on Desktop-bundled installs (it skips), and the PATH-binary limitation (RV3-L4)
   - the **bash variant on macOS** (portable commands required, but only run on Linux/WSL; RV5-L3)
+  - the **bash clean-slate blocks under Git Bash on Windows**, the main Windows path for them. There `git rev-parse` returns `C:/…` while `pwd -P` returns `/c/…`, links are often junctions, and the repo guard's comparison is case-sensitive, so the guard could miss a path (third review L1). Files would be moved, not deleted
   - the **PowerShell variant of the clean-slate move** (RV3-M3). It follows the bash variant's rules and is lint-checked for delete verbs, but has never run on Windows
 - **Future concerns:** §9.
 - **Reviewer note:** Hebrew changes need a Hebrew-speaking contributor's approval.
@@ -654,7 +655,7 @@ Manual checks 4–6, the VAT grep and `spoken_lesson_refs` cover changes that §
 | 1c | Module 02 rename. `2.5_script.txt:97` expands MCP as "Multi-Claude-Pipeline" (RV3-L12). **If 2.0 teaches uv, learner projects live outside the repo folder** (uv project discovery would otherwise attach to `tov-learn`) |
 | 1d | `@supabase/ssr`/auth rewrite; Prisma removal; an end-to-end check of the MCP flow |
 | 1e | Restore `/learn project` and the resume offer; delete the TEMPORARY blocks; `projects.md:7` |
-| Gate | Remove the README tester note, the CLEAN-SLATE section and `clean_slate_no_delete` |
+| Gate | Remove the README tester note, the CLEAN-SLATE section, `clean_slate_no_delete` and the `test_clean_slate_*` behavioural tests (they read the section out of `setup.md` and would fail with an IndexError) |
 | S2a | Whether `learn.md` stays model-invocable; 3-OS pytest CI (already on uv); learner CLI without uv; Dependabot `uv` once 0.12 support is confirmed |
 
 ---
@@ -803,6 +804,20 @@ A second review of the fixed branch (same setup) raised 2 Medium and 7 Low findi
 | SR-L5 | `--show-toplevel` misses the main checkout from a linked worktree | **Not fixed**: the spec names `--show-toplevel`; contributors only |
 | SR-L6 | A `.git` that git refuses to read crashed the lints | §5.1: walk instead |
 | SR-L7 | Three small validator gaps | **Not fixed**: none affects the tree |
+
+A third review (same setup) raised no High or Medium findings, 10 Low and 2 nits. The user approved fixing items 1–6, 8 and 10.
+
+| # | Finding | Resolution |
+|---|---|---|
+| TR-L1 | The bash clean-slate blocks are untested under Git Bash on Windows | Added to §6.2's untested list (and so to the PR) |
+| TR-L2 | The gate checklist omitted the clean-slate behavioural tests | §9 Gate row |
+| TR-L3, L4, L5 | `changes.md`: the review fixes weren't described; entry 9 overstated the frontmatter; entry 6's "Before" was slightly wrong | Fixed |
+| TR-L6 | This header said three content items | Four |
+| TR-L7 | `relative_links` skips the outer target of `[![img](a)](b)` | **Not fixed**: a new lint gap, not in the spec |
+| TR-L8 | `test_worktree_git_file` pinned git config for `commit` only | Every git call in the git-tree tests ignores global and system config |
+| TR-L9 | Two silent fallbacks (`inside_repo` on a failed `cd`, `repo_files` on a git error) | **Not changed**: they match the spec as written |
+| TR-L10 | The 1.6 dummy row had no `accountant_id`, so the RLS policy hid it | The step now says to set it (the rest is 1d's) |
+| nits | `"בוחן"` listed before `"בוחן מלא"`; an empty backup folder if everything is skipped | **Not changed**: same ambiguity as the existing `quiz me` rows; harmless |
 
 ### Plan review (2026-09-29, rev 6.1)
 A fresh single-agent review of the implementation plan also reported four editorial inconsistencies in this spec. All were fixed in place, and no decision changed. Its plan findings were fixed in the plan.
