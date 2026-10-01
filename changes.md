@@ -244,7 +244,7 @@ Fixes what testers hit now (wrong course name, missing lessons, a broken hook, a
 
 ## 6. Lesson 1.3 hook exercise is safe
 
-**Before:** exercise 5 asked for a Bash hook that prompts for Y/N (hooks have no terminal), with no exit code, in global settings; the script claimed exit code 1 blocks.
+**Before:** exercise 5 asked for a Bash hook that prompts for Y/N (hooks have no terminal), with no exit code, in global or project settings; the script claimed exit code 1 blocks.
 
 **After:** a project-scoped PreToolUse hook blocks *reading* a fake secret (`if: "Read(secret-demo.txt)"`, exit 2), then a `cat` in the terminal shows the bypass. Nothing is written or deleted. The script explains that only exit 2 blocks. The lesson needs Claude Code 2.1.176 or later.
 
@@ -252,7 +252,7 @@ Fixes what testers hit now (wrong course name, missing lessons, a broken hook, a
 
 **Before:** the deprecated anon/service_role keys, and an invalid `claude mcp add` command.
 
-**After:** `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` / `SUPABASE_SECRET_KEY`; the hosted MCP server added read-only at project scope, then authenticated through `claude /mcp`. The exercise inserts its sample row in the Table Editor, not through MCP.
+**After:** `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` / `SUPABASE_SECRET_KEY`; the hosted MCP server added read-only at project scope, then authenticated through `claude /mcp` (Claude Code also asks once to approve a project-scoped server). The exercise inserts its sample row in the Table Editor, not through MCP.
 
 ## 8. Old project B moved out
 
@@ -262,9 +262,9 @@ Fixes what testers hit now (wrong course name, missing lessons, a broken hook, a
 
 ## 9. Tutor: sub-modules can't be auto-invoked
 
-**Before:** Claude could load any `learn/*.md` sub-module on its own.
+**Before:** Claude could invoke any `learn/*.md` sub-module as a command on its own.
 
-**After:** all 15 start with `disable-model-invocation: true`.
+**After:** all 15 start with `disable-model-invocation: true`. The router still `Read`s them; only the model's own command invocation is blocked.
 
 ## 10. Tutor: Hebrew aliases
 
@@ -284,7 +284,7 @@ Fixes what testers hit now (wrong course name, missing lessons, a broken hook, a
 
 ## 13. Setup: temporary clean-slate step
 
-**After:** `/learn setup` looks for leftovers at exactly `~/skill-tutor-tutorials/`, `~/.claude/commands/learn.md` and `~/.claude/commands/learn/`, shows them, and on an explicit yes moves them into `~/skill-tutor-tutorials-backup-<date>`. Nothing is deleted. Removed at the first-cohort gate.
+**After:** `/learn setup` looks for leftovers at exactly `~/skill-tutor-tutorials/`, `~/.claude/commands/learn.md` and `~/.claude/commands/learn/`, shows them, and on an explicit yes moves them into `~/skill-tutor-tutorials-backup-<date>`. Nothing is deleted. A path that lives inside this repo, or that contains it (a `~/.claude/commands` symlinked to the repo, or a clone placed inside `~/skill-tutor-tutorials/`), is shown as `SKIP` and never moved. Removed at the first-cohort gate.
 
 ## 14. Setup: Claude Code version check
 
