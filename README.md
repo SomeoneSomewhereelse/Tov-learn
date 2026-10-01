@@ -26,7 +26,7 @@ Interactive AI tutor, built as a Claude Code skill.
 
 ### Step 1 — Prerequisites
 
-- [Claude Code](https://claude.ai/code) installed (Pro plan or higher)
+- [Claude Code](https://claude.ai/code) 2.1.176 or later installed (Pro plan or higher)
 - Git
 
 ### Step 2 — Clone and open
@@ -208,7 +208,7 @@ CLAUDE.md                   ← architecture overview for contributors
 
 ## Requirements
 
-- Claude Code (Pro plan or higher)
+- Claude Code 2.1.176 or later (Pro plan or higher)
 - Windows (for TTS voice support) — TTS can be disabled on any OS
 
 ## License
