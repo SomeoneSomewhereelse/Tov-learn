@@ -96,7 +96,7 @@ foreach ($p in @((Join-Path $HOME 'skill-tutor-tutorials'), (Join-Path $HOME '.c
 Use `AskUserQuestion`:
 
 ```
-question: "נמצאו קבצים מהתקנה קודמת של /learn. מה לעשות איתם?"
+question: "נמצאו נתוני למידה או התקנה קודמת של /learn (כולל ההתקדמות שלך, אם התחלת ללמוד). מה לעשות איתם?"
 header: "ניקוי התקנה"
 options:
   - label: "להשאיר הכל"
