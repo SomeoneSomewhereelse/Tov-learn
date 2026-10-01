@@ -30,7 +30,7 @@ The plan was executed inline, then one fresh Opus 5.5 reviewer read the whole br
 | L9 | The clean-slate prompt says the data may include the tester's live progress | `setup.md` |
 | L10 | 1.6 mentions the first-use approval of a project-scoped MCP server | content |
 
-**What changes in the numbers.** The code blocks in Tasks 1 and 14 are the first-run versions. The finished branch has 64 tests (58 + 3 clean-slate + `root-absolute-link` + `root-absolute-missing` + the missing-git fallback), not 58. Every "58" below is the original run's count; the final evidence is `64 passed`, ruff silent, `0 finding(s)`. The branch is 22 plan commits plus 11 review-fix commits. Manual check 3 is unchanged: `test_clean_slate_move_leaves_the_repo_alone` covers the symlink case without touching the user's `$HOME`.
+**What changes in the numbers.** The code blocks in Tasks 1 and 14 are the first-run versions. The finished branch has 64 tests (58 + 3 clean-slate + `root-absolute-link` + `root-absolute-missing` + the missing-git fallback), not 58. Every "58" below is the original run's count; the final evidence is `64 passed`, ruff silent, `0 finding(s)`. The branch is 22 plan commits plus 12 review-fix commits (the last one is this section and the spec update): 34 in all. Manual check 3 is unchanged: `test_clean_slate_move_leaves_the_repo_alone` covers the symlink case without touching the user's `$HOME`.
 
 ## Global Constraints
 
