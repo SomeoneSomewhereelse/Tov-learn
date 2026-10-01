@@ -290,6 +290,11 @@ SEEDS = [
         "missing-target",
         append("README.md", "\nSee [missing](docs/missing.md).\n"),
     ),
+    (
+        "relative_links",
+        "root-absolute-missing",
+        append("docs/guide.md", "[gone](/docs/gone.md)\n"),
+    ),
     # clean_slate_no_delete
     (
         "clean_slate_no_delete",
@@ -345,6 +350,10 @@ def test_seeded_regression_fails_only_its_check(
 
 
 NEGATIVES = [
+    (
+        "root-absolute-link",
+        append("docs/guide.md", "[home](/README.md)\n"),
+    ),
     ("job-title", append(S01, "תפקיד ה-AI Engineer מבוקש. AI Engineer הוא תפקיד.\n")),
     (
         "archive-denied",
@@ -582,6 +591,19 @@ def test_clean_slate_find_skips_paths_inside_the_repo(tmp_path: Path) -> None:
     assert f"FOUND {home}/skill-tutor-tutorials" in lines
     assert sum(line.startswith("SKIP ") for line in lines) == 2
     assert not [line for line in lines if line.startswith("FOUND ") and "commands" in line]
+
+
+def test_repo_files_without_git_falls_back_to_walking(
+    good_tree: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """RV-final L4: a .git folder but no git executable must not crash the lints."""
+    (good_tree / ".git").mkdir()
+
+    def no_git(*args, **kwargs):
+        raise FileNotFoundError("git")
+
+    monkeypatch.setattr(vs.subprocess, "run", no_git)
+    assert Path("README.md") in vs.repo_files(good_tree, "**/*.md")
 
 
 def test_real_repo_passes() -> None:

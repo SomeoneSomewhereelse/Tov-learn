@@ -26,11 +26,16 @@ def repo_files(root: Path, pattern: str) -> list[Path]:
     a file in a worktree), so local runs see what CI sees. Tracked entries
     missing on disk are skipped. Otherwise walks the filesystem.
     """
+    tracked = None
     if (root / ".git").exists():
         cmd = ["git", "-C", str(root), "ls-files", "-z"]
-        out = subprocess.run(cmd, capture_output=True, check=True).stdout
-        rels = [PurePosixPath(p) for p in out.decode("utf-8").split("\0") if p]
-        rels = [r for r in rels if (root / r).is_file()]
+        try:
+            out = subprocess.run(cmd, capture_output=True, check=True).stdout
+            tracked = [PurePosixPath(p) for p in out.decode("utf-8").split("\0") if p]
+        except FileNotFoundError:  # git itself isn't installed: walk instead
+            pass
+    if tracked is not None:
+        rels = [r for r in tracked if (root / r).is_file()]
     else:
         rels = []
         for p in root.rglob("*"):
@@ -413,7 +418,9 @@ def check_relative_links(root: Path) -> list[str]:
                 if target.startswith(("http:", "https:", "mailto:", "#")):
                     continue
                 path = unquote(target.split("#", 1)[0])
-                if path and not (root / rel.parent / path).exists():
+                # "/x.md" is relative to the repo root, as on GitHub
+                base = root if path.startswith("/") else root / rel.parent
+                if path and not (base / path.lstrip("/")).exists():
                     msg = f"link target {target!r} does not exist"
                     out.append(finding("relative_links", rel, i, msg))
     return out
