@@ -4,11 +4,11 @@ Welcome back, and welcome to Lesson 0.3 — the last lesson in Module Zero. In o
 
 Why do I call it the most important skill? Because everything we do from this point forward — automations, chatbots, AI agents, marketing systems — is built on top of prompts. A great prompt delivers a great result. A vague prompt delivers a frustrating one. The AI is often not the problem. The prompt is. And that is entirely within your control.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 This lesson is four academic hours — the longest lesson in the module — because there is a lot of practical ground to cover. Here is what we will move through together. We will start with the fundamentals: what a prompt actually is and why its quality matters so much. Then we will learn six core techniques in ascending order of complexity. After that we will look at System Prompts — how to write standing instructions that define an AI's behavior in a product or automation. We will explore Extended Thinking and the new Adaptive Thinking mode in the latest Claude models. We will then step up to Context Engineering, which is the next level beyond prompting. And we will close by building your personal prompt library, which is the module project you will walk away with.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Let me start with a concrete example that makes everything clear. Two people ask Claude the exact same thing.
 
@@ -18,7 +18,7 @@ Person B types: "You are a marketing manager at a B2B SaaS company. Write a foll
 
 Who gets a better result? Person B, obviously. And here is the critical insight: the difference is not in the AI. Both people are using the same model. The difference is entirely in the prompt. Research published in 2026 confirms that the majority of failures with AI tools stem from ambiguity in the prompt, not from limitations of the model. A clear structure outperforms a clever phrase every single time.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 So let us talk about structure. There is a simple formula that works in almost every situation. It has four components, and we call it RTCF.
 
@@ -36,7 +36,7 @@ Now here is an important research finding from 2026: the sweet spot for prompt l
 
 One more nuance worth knowing. Aggressive language — phrases like "You must!", "Under no circumstances!", "Critical!!!" — actually hurts performance, especially with the newest Claude models. Calm, clear instructions outperform forceful ones. And Claude Sonnet 4.6 in particular follows instructions very literally. If you do not ask for something explicitly, you will not get it. Earlier versions were more initiative-taking. The current generation is more precise but less spontaneous, which means your prompts need to be more complete and specific.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Before we move to the six techniques, there is a distinction every AI engineer must understand. It is the difference between Casual Prompting and Production Prompting.
 
@@ -60,7 +60,7 @@ Sixth, monitor quality over time. Models get updated. What worked perfectly six 
 
 Anyone who wants to build AI products — not just use AI — must think with this Production Mindset from the start.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Now let us get into the six techniques. We will build from simplest to most sophisticated.
 
@@ -72,7 +72,7 @@ In 2026, modern AI models are capable enough to handle a vast range of tasks wit
 
 Zero-Shot works well for standard tasks: summarization, translation, basic classification, general writing, and question answering. That covers roughly eighty percent of what you will encounter in real-world work.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Technique two is Few-Shot prompting. This means providing the AI with a small number of examples before the actual request. It is one of the highest-return techniques available. Three to five diverse, well-chosen examples can dramatically improve output quality.
 
@@ -86,7 +86,7 @@ Then you send the real inquiry: "I never received my package." And the model cla
 
 There is an important tip specific to Claude Sonnet 4.6: wrap your examples in XML tags. Use tags like examples and example around your demonstration inputs and outputs. Claude performs measurably better with XML-structured prompts than with Markdown-formatted ones. GPT-5.5, on the other hand, handles Markdown headers very well. Knowing which format to use for which model is part of being an effective AI engineer.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Technique three is Chain of Thought, or CoT. This is one of the most powerful techniques for complex reasoning, and research shows it can improve accuracy by up to nineteen percentage points on difficult multi-step tasks.
 
@@ -102,7 +102,7 @@ Without Chain of Thought, the AI might skip steps and arrive at the wrong number
 
 There is one important caveat for 2026. Models that have reasoning built in — like Claude Sonnet 4.6 with its Adaptive Thinking mode, and GPT-5.5 in its thinking configuration — are already doing Chain of Thought internally. If you are using one of those reasoning modes, do not add "think step by step" to your prompt. The model is already doing it behind the scenes, and explicitly asking for it can actually interfere.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Technique four is Tree of Thought, or ToT. This is an advanced version of Chain of Thought where the AI explores multiple reasoning paths in parallel, like a tree branching in different directions.
 
@@ -112,7 +112,7 @@ The AI will generate three branches, evaluate each one, and then synthesize a re
 
 The honest recommendation for 2026 is this: do not use Tree of Thought routinely. It consumes significantly more tokens, which means it costs significantly more. In ninety-nine percent of situations, regular Chain of Thought is sufficient. Tree of Thought is worth the cost only for genuinely high-stakes decisions where exploring multiple paths before committing is truly important — a major strategic choice, a complex architectural decision, a significant investment.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Technique five is Role Prompting. We already introduced this as part of the RTCF formula, but it deserves its own deeper look because it is that impactful.
 
@@ -126,7 +126,7 @@ An excellent role: "You are a digital marketing manager at a B2B SaaS company wi
 
 In 2026, Role Prompting is a standard component of every well-crafted System Prompt. It is not optional — it is foundational.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Technique six is Self-Consistency. The idea here is to ask the AI to generate multiple different answers to the same question, and then either select the most common answer or synthesize the best elements from all of them.
 
@@ -134,7 +134,7 @@ A prompt that uses Self-Consistency might look like this: "Provide three distinc
 
 Self-Consistency is particularly valuable when you are dealing with uncertainty: legal analysis, complex business decisions, technical diagnosis. When the AI's three answers are very different from each other, that is itself valuable information — it signals that the question may be underspecified, or that the AI genuinely does not have high confidence. You can use that signal to ask better questions or to investigate further.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Let us consolidate the six techniques before moving on.
 
@@ -147,7 +147,7 @@ Self-Consistency: generate multiple answers and compare, especially useful under
 
 Zero-Shot with RTCF covers eighty percent of what you will encounter professionally. The advanced techniques are your toolkit for the other twenty percent.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Now let us talk about System Prompts. A System Prompt is a standing instruction that defines how the AI behaves throughout an entire conversation or session. In the ChatGPT interface, this is called Custom Instructions. In Claude, it is the system parameter in the API. In any chatbot or automation you build, the System Prompt is the heart of the product.
 
@@ -165,7 +165,7 @@ For Claude Sonnet 4.6, use XML tags to structure your System Prompt — tags lik
 
 And here is one rule that applies to every model, without exception: give the AI explicit permission to say "I am not sure" or "I do not know." This single addition reduces hallucinations meaningfully. An AI that has been told it can admit uncertainty will do so. An AI that has been given no such permission tends to fill gaps with invented answers.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 One of the most significant developments in AI through 2025 and 2026 has been the integration of reasoning directly into the leading models. You no longer have to manually prompt for step-by-step thinking — the models can do it automatically.
 
@@ -179,7 +179,7 @@ The golden rule for all of these reasoning modes: if you are using Adaptive Thin
 
 When should you use reasoning modes? Mathematical problems, complex code debugging, multi-step logical analysis, and high-stakes decision-making. When should you not? Writing an email, summarizing a document, generating a social media post. For simple tasks, reasoning mode wastes tokens and costs more for no benefit.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Now we come to the concept that defines where this field is heading in 2026: Context Engineering. What is it?
 
@@ -207,7 +207,7 @@ Gartner projects that forty percent of enterprise applications will include task
 
 We will build on this deeply in Modules Two and Five when we work on AI agents and API integrations.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 As a companion to Context Engineering, there is a practical topic that every production AI builder needs to understand: Context Management. This is about how you handle information within the context window.
 
@@ -221,7 +221,7 @@ The third trap is cost. Every token costs money. A long System Prompt, an extend
 
 The practical summary: place critical instructions at the start of your prompt; place examples at the end; use compaction for long conversations; and always calculate your token budget before deploying.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Now let us talk about the Module Zero project: building your personal prompt library.
 
@@ -238,13 +238,13 @@ Six: a sample output — paste in an actual result so you can compare future out
 
 You can build your library in Google Docs, Notion, or any format you prefer. The tool does not matter. The discipline does.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 To give you a starting point, here are examples of the kinds of prompts worth including in your library. A sales email prompt, where you define your product, your target customer, and the email's goal. A meeting summary prompt that converts rough notes into structured action items. A competitor analysis prompt that systematically compares features, pricing, and positioning. A social media post generator tuned to your brand's voice and platform. A customer inquiry classifier that routes incoming requests by category and urgency. A proposal or quote generator for your service or product offering. An SEO content prompt that targets a specific keyword and audience. A customer review analyzer that extracts themes and sentiment patterns from feedback. A full System Prompt for a customer service chatbot. And an image prompt generator for creating product visuals or marketing materials.
 
 These are starting points. The prompts that will serve you best are the ones tuned to the specific situations you encounter in your work. The more precisely you tailor them, the more value they deliver.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 Let us now bring the whole lesson together.
 
@@ -260,7 +260,7 @@ We learned about Adaptive Thinking in Claude Sonnet 4.6 and the built-in reasoni
 
 And we learned two concepts that will recur throughout this entire course. Context Engineering — the discipline of architecting the full informational environment in which an AI agent operates: System Prompts, conversation history, documents, tools, memory, and knowledge retrieval. And Context Management — the practical discipline of handling Lost in the Middle, Context Rot, and token costs in production systems. Every competent AI engineer understands both.
 
-[SLIDE TRANSITION]
+[מעבר שקף]
 
 In our next lesson, we begin Module One: Business Automations. We will move straight into hands-on work with Make.com and build our first real automation from scratch. You will see immediately how everything we covered today — prompt structure, production mindset, System Prompts — connects directly to building smart, reliable automations. The skills from this lesson are not abstract. They are the wiring behind everything we build next.
 
