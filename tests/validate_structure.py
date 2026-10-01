@@ -24,7 +24,8 @@ def repo_files(root: Path, pattern: str) -> list[Path]:
 
     Uses ``git ls-files -z`` when ``root/.git`` exists (a directory in a clone,
     a file in a worktree), so local runs see what CI sees. Tracked entries
-    missing on disk are skipped. Otherwise walks the filesystem.
+    missing on disk are skipped. Otherwise (no .git, no git executable, or a
+    .git that git refuses to read) it walks the filesystem.
     """
     tracked = None
     if (root / ".git").exists():
@@ -32,8 +33,8 @@ def repo_files(root: Path, pattern: str) -> list[Path]:
         try:
             out = subprocess.run(cmd, capture_output=True, check=True).stdout
             tracked = [PurePosixPath(p) for p in out.decode("utf-8").split("\0") if p]
-        except FileNotFoundError:  # git itself isn't installed: walk instead
-            pass
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            pass  # git is missing, or refuses this .git: walk instead
     if tracked is not None:
         rels = [r for r in tracked if (root / r).is_file()]
     else:

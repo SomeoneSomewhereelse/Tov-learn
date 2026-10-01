@@ -626,6 +626,19 @@ def test_clean_slate_skips_a_folder_that_contains_the_repo(
     assert "STILL PRESENT" not in result.stdout
 
 
+def test_repo_files_with_a_broken_git_falls_back_to_walking(
+    good_tree: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Review 2 L6: a .git that git refuses to read must not crash every lint."""
+    (good_tree / ".git").mkdir()
+
+    def broken_git(*args, **kwargs):
+        raise subprocess.CalledProcessError(128, "git")
+
+    monkeypatch.setattr(vs.subprocess, "run", broken_git)
+    assert Path("README.md") in vs.repo_files(good_tree, "**/*.md")
+
+
 def test_real_repo_passes() -> None:
     findings = [f for check in vs.CHECKS for f in check(REPO_ROOT)]
     assert not findings, f"{len(findings)} finding(s):\n" + "\n".join(findings)
