@@ -73,3 +73,15 @@ architectures/[project-name].html     ← מפות ארכיטקטורה
 2. התחל את הקובץ בבלוק ה-frontmatter של `disable-model-invocation: true` (שלוש שורות: `---`, `disable-model-invocation: true`, `---`), כדי שקלוד לא יטען את המודול בעצמו
 3. הוסף שורה לטבלת ה-Modules למעלה
 4. הוסף routing ב-`learn.md` (Step 2 — Route table)
+
+---
+
+## בדיקות (למפתחי הקורס בלבד — contributors only)
+
+לומדים לא צריכים את זה. מפתחי הקורס צריכים את [uv](https://docs.astral.sh/uv/getting-started/installation/); זו נקודת הכניסה היחידה הנתמכת לבדיקות:
+
+```
+uv run ruff check -q && uv run pytest -q
+```
+
+אם pytest אדום, הריצו שוב `uv run pytest -v` כדי לראות אילו בדיקות נכשלו. הבדיקות עצמן נמצאות ב-`tests/validate_structure.py`.

@@ -66,4 +66,5 @@ Modules live in `.claude/commands/learn/`. Each module is a standalone markdown 
 
 - One PR per change (lesson, module, or fix)
 - Test the flow manually with `/learn` before opening the PR
+- Run `uv run ruff check -q && uv run pytest -q` before opening a PR (contributors need [uv](https://docs.astral.sh/uv/getting-started/installation/))
 - Describe what the learner experience looks like after your change
