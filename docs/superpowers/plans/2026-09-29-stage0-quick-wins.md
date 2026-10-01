@@ -8,13 +8,13 @@
 
 **Tech Stack:** uv 0.12.19 (CI pin; local ≥ 0.12), Python 3.14, pytest ≥ 9.1.1, ruff ≥ 0.16.9, GitHub Actions (`actions/checkout` v7.0.1, `astral-sh/setup-uv` v10.2.0, SHA-pinned), Claude Code slash-command markdown (the tutor), Hebrew course content.
 
-**Spec:** `docs/superpowers/specs/2026-09-27-stage0-quick-wins-design.md` (revision 6.1, locked 2026-09-29; rev 6.1 is editorial only). Parent PRD: `docs/prds/project-redesign-2026-09-25.md`, whose §8 amendments A1–A13 win over the text above them. Read the spec before starting. This plan argues from it and does not repeat its reasons.
+**Spec:** `docs/superpowers/specs/2026-09-27-stage0-quick-wins-design.md` (revision 6.2; locked 2026-09-29, with rev 6.1 editorial and rev 6.2 recording the final-review fixes). Parent PRD: `docs/prds/project-redesign-2026-09-25.md`, whose §8 amendments A1–A13 win over the text above them. Read the spec before starting. This plan argues from it and does not repeat its reasons.
 
 **How this plan was checked (2026-09-29):** the validator and the tests below were run with uv 0.12.19, pytest 9.1.1 and ruff 0.16.9 against a clone of the docs branch. Every edit block in Tasks 2–22 was then applied in order to a second clone, and the real-repo finding count after each task matched the **Expected** line of that task. The fixed tree ended with 0 findings, `ruff check` clean, and 58 tests passing. This plan file itself passes `relative_links`. A fresh single-agent review of this plan (2026-09-29) found no High issues. Its 2 Medium and 6 Low findings are fixed here: sentinel-guarded cleanup and a settings hash at every manual check, the Task 1 Step 5 expectation, abort recovery, commit authorization in Task 0, the CI-run race, and PowerShell dangling links. Its 4 spec findings are fixed in spec rev 6.1 (§10, PR-S1–S4). The dry run above was repeated after the fixes.
 
 ## Post-implementation amendments (rev 6.2, 2026-10-01)
 
-The plan was executed inline, then one fresh Opus 5.5 reviewer read the whole branch (Task 23 Step 4). The user approved fixing every finding, as separate commits after the 22 plan commits. The task text below is otherwise unchanged and describes the original run. Where it disagrees with this section, this section wins:
+The plan was executed inline, then a fresh Opus 5.5 reviewer read the whole branch (Task 23 Step 4). The user approved fixing the findings, as separate commits after the 22 plan commits. The branch was reviewed twice: the first review's findings are the rows below up to L10, and a second review of the fixed branch added rows SR-M1 to SR-L6. The task text below is otherwise unchanged and describes the original run. Where it disagrees with this section, this section wins:
 
 | Finding | Fix | Where |
 |---|---|---|
@@ -29,8 +29,14 @@ The plan was executed inline, then one fresh Opus 5.5 reviewer read the whole br
 | L8 | `1.1_script.txt:1` "אחת נקודה אחד" becomes "אחת נקודה אחת". The masculine "מודול אחת" (five places) is left for the Hebrew reviewer | content |
 | L9 | The clean-slate prompt says the data may include the tester's live progress | `setup.md` |
 | L10 | 1.6 mentions the first-use approval of a project-scoped MCP server | content |
+| SR-M1 | The clean-slate guard only asked whether a path is inside the repo, so a clone placed in `~/skill-tutor-tutorials/` was moved with that folder. It now also skips a path that contains the repo (bash and PowerShell) | `setup.md`, tests |
+| SR-M2 | `0.2_script.txt` promised Make, n8n and ManyChat. The tools slide now describes Module 02, in the wording of the module overview. `2.5_script.txt:2` ("במודול האינטגרציות") stays for unit 1c | content |
+| SR-L1, L2 | The commit count and the "revision 6.1" citation in this file were wrong | this section, the header |
+| SR-L3, L4 | PowerShell `Test-InRepo`: no longer fails without `git` (Get-Command and try/catch), and its prefix test ends in a path separator | `setup.md` |
+| SR-L6 | `repo_files` also walks when `git ls-files` itself fails (corrupt `.git`, dubious ownership) | validator, tests |
+| SR-L5, L7 | Not fixed, by decision. L5: the guard uses `--show-toplevel`, as the spec says, so a linked worktree's main checkout isn't covered (contributors only). L7: three validator gaps (a module row with no backticked folder, a lesson folder without the `X.Y-` prefix, `<…>` link targets with spaces) don't affect the tree | none |
 
-**What changes in the numbers.** The code blocks in Tasks 1 and 14 are the first-run versions. The finished branch has 64 tests (58 + 3 clean-slate + `root-absolute-link` + `root-absolute-missing` + the missing-git fallback), not 58. Every "58" below is the original run's count; the final evidence is `64 passed`, ruff silent, `0 finding(s)`. The branch is 22 plan commits plus 12 review-fix commits (the last one is this section and the spec update): 34 in all. Manual check 3 is unchanged: `test_clean_slate_move_leaves_the_repo_alone` covers the symlink case without touching the user's `$HOME`.
+**What changes in the numbers.** The code blocks in Tasks 1 and 14 are the first-run versions. The finished branch has 67 tests, not 58: three clean-slate behavioural tests, `root-absolute-link`, `root-absolute-missing` and the missing-git fallback (first review), then two more clean-slate cases (a folder that contains the repo, for Step 1 and Step 3) and the broken-git fallback (second review). Every "58" below is the original run's count; the final evidence is `67 passed`, ruff silent, `0 finding(s)`. The branch is the 22 plan commits plus the review-fix commits; `git log --oneline master..HEAD` is the count. Manual check 3 is unchanged: `test_clean_slate_move_leaves_the_repo_alone` covers the symlink case without touching the user's `$HOME`.
 
 ## Global Constraints
 

@@ -1,6 +1,6 @@
 # Stage 0 — Quick-Win PR: Design Spec
 
-**Date:** 2026-09-27 · **Revision:** 6.2 (2026-10-01), after five independent reviews, the plan review and the final branch review (§10) · **Status:** **locked** by the user (2026-09-29); rev 6.1 is editorial only (no decision changed). Rev 6.2 records the fixes from the final branch review (§10); it changes S5's guard, one lint rule and two content items. Plan: `docs/superpowers/plans/2026-09-29-stage0-quick-wins.md`
+**Date:** 2026-09-27 · **Revision:** 6.2 (2026-10-01), after five independent reviews, the plan review and the final branch review (§10) · **Status:** **locked** by the user (2026-09-29); rev 6.1 is editorial only (no decision changed). Rev 6.2 records the fixes from the final branch review (§10); it changes S5's guard, two lint rules and three content items. Plan: `docs/superpowers/plans/2026-09-29-stage0-quick-wins.md`
 **Parent:** `docs/prds/project-redesign-2026-09-25.md` (the PRD). References such as "D2 item 5", "§3" and "R14" point there. "Review §2.x" points to `docs/reviews/project-review-2026-09-24.md`. "RV-…" through "RV5-…" point to the spec reviews (§10).
 **Baseline:** `master` at `290af75` (= `origin/master`, after #12 and #13 were merged on 2026-09-28). Its tree is identical to the earlier local `d04ca2a` (tree `5bf8edb`), so every line number below refers to that tree.
 **Scope:** Stage 0 only:
@@ -330,7 +330,7 @@ All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n--
    ```
    - **The whole move runs as one single Bash (or PowerShell) tool invocation**, never split across calls, because shell variables don't survive between tool calls. The block guards `: "${dest:?}"` right after computing `dest`, before the first `mv` (RV5-M5).
    - `mv` moves a symlink as a link and never follows it. PowerShell uses `Move-Item -LiteralPath … -ErrorAction Stop`, after checking `$HOME` and `$dest` are non-empty.
-   - **Never inside the repo, even through a symlinked parent (final-review M2).** A tester may have linked `~/.claude/commands` to the repo's `.claude/commands`; `mv "$HOME/.claude/commands/learn.md"` would then move the repo's own file. Both Step 1 (find) and Step 3 (move) first resolve each path's real parent folder (`cd -P … && pwd -P`; in PowerShell, any link among the parents whose target lies inside `git rev-parse --show-toplevel`). A path whose real location is inside the repo prints `SKIP …`, is never counted, never moved and never reported as `STILL PRESENT`. Moving the final path component itself (a link) is still allowed.
+   - **Never inside the repo, even through a symlinked parent (final-review M2).** A tester may have linked `~/.claude/commands` to the repo's `.claude/commands`; `mv "$HOME/.claude/commands/learn.md"` would then move the repo's own file. Both Step 1 (find) and Step 3 (move) first resolve each path's real parent folder (`cd -P … && pwd -P`; in PowerShell, any link among the parents whose target lies inside `git rev-parse --show-toplevel`). The same check also skips a path that *contains* the repo (a clone placed in `~/skill-tutor-tutorials/`). A path whose real location overlaps the repo either way prints `SKIP …`, is never counted, never moved and never reported as `STILL PRESENT`. Moving the final path component itself (a link) is still allowed.
    - On any error: stop and report. Never retry with force, and never delete.
    - **Across filesystems (RV3-M4).** If a source sits on another filesystem (e.g. `~/.claude/commands` symlinked to `/mnt/c/…`), `mv` copies and then removes the original. An interruption leaves the original intact, or both copies, but never neither. The step claims "nothing is lost", not "nothing is unlinked".
 5. **Verify and report.** Each original path is gone and present in the backup. The backup's **entry counts, taken the same no-follow way, equal the counts shown in step 2** (RV3-M4, RV4-L4). Print the backup path.
@@ -403,7 +403,7 @@ Written once, as the last commit of group D, appended after the existing section
 - **Course scope:** `courses/*/` except `courses/_archive/`, skipping `old_B*` files.
 - **File discovery (RV2-L8):** a helper `repo_files(root, pattern)`:
   - uses `git ls-files -z` when `root/.git` exists, **as a file or a directory** (in a worktree `.git` is a file; RV5-L4), so local results match CI, and non-ASCII paths come out unquoted. Entries missing on disk (deleted in the working tree) are skipped (RV4-L10)
-  - otherwise walks the filesystem (the pytest fixture trees), and so does a repo whose `git` executable is missing (final-review L4)
+  - otherwise walks the filesystem (the pytest fixture trees), and so does a repo whose `git` executable is missing or whose `.git` git refuses to read (final-review L4, second-review L6)
 
 | Check | Rule |
 |---|---|
@@ -453,7 +453,7 @@ Written once, as the last commit of group D, appended after the existing section
   - an allowlisted phrase; a spoken reference to an existing lesson
   - "Confirm", "model" and "perform" between the markers; `rm` outside them
   - a missing `settings.json`
-- **Behavioural tests of the clean-slate blocks (final-review M2).** They run the real bash blocks of `setup.md` Steps 1 and 3 against a fake `HOME` and a fake repo: a symlinked `~/.claude/commands` leaves the repo's files alone; a real global install is still moved; the find step prints `SKIP`. A further test makes `repo_files` fall back to walking when `git` is missing, and `test_worktree_git_file` pins `commit.gpgsign=false` and `core.hooksPath=/dev/null`.
+- **Behavioural tests of the clean-slate blocks (final-review M2).** They run the real bash blocks of `setup.md` Steps 1 and 3 against a fake `HOME` and a fake repo: a symlinked `~/.claude/commands` leaves the repo's files alone; a real global install is still moved; the find step prints `SKIP`; a folder that contains the repo is skipped by both steps. A further test makes `repo_files` fall back to walking when `git` is missing, and `test_worktree_git_file` pins `commit.gpgsign=false` and `core.hooksPath=/dev/null`.
 - **`test_real_repo_passes`:** every check on the real repo, with the findings in the assertion message. Red until groups C and T land: it turns green at the T5 (clean-slate) commit, and group D must keep it green.
 
 ### 5.3 Toolchain files
@@ -791,6 +791,18 @@ A fresh single-agent Opus 5.5 review of the finished branch raised 2 Medium and 
 | FR-L8 | `1.1_script.txt:1` "אחת נקודה אחד"; masculine "מודול אחת" | The first is fixed; the second is left for the Hebrew reviewer |
 | FR-L9 | The step-0 prompt called live progress "a previous install" | Prompt reworded |
 | FR-L10 | 1.6 omitted the project-scope approval prompt | One sentence added |
+
+A second review of the fixed branch (same setup) raised 2 Medium and 7 Low findings. The user approved fixing all but two Low ones.
+
+| # | Finding | Resolution |
+|---|---|---|
+| SR-M1 | The guard didn't skip a path that contains the repo | §4.3: skipped both ways; two behavioural tests |
+| SR-M2 | `0.2_script.txt` promised Make, n8n and ManyChat | Rewritten to Module 02's tools; `2.5_script.txt:2` left for 1c |
+| SR-L1, L2 | Wrong commit count and "revision 6.1" in the plan | Fixed |
+| SR-L3, L4 | PowerShell guard failed without git; prefix test had no separator | Fixed |
+| SR-L5 | `--show-toplevel` misses the main checkout from a linked worktree | **Not fixed**: the spec names `--show-toplevel`; contributors only |
+| SR-L6 | A `.git` that git refuses to read crashed the lints | §5.1: walk instead |
+| SR-L7 | Three small validator gaps | **Not fixed**: none affects the tree |
 
 ### Plan review (2026-09-29, rev 6.1)
 A fresh single-agent review of the implementation plan also reported four editorial inconsistencies in this spec. All were fixed in place, and no decision changed. Its plan findings were fixed in the plan.
