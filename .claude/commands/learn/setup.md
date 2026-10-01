@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Setup Module
 
 *Loaded by learn.md when settings.json is missing or $ARGUMENTS = "setup".*

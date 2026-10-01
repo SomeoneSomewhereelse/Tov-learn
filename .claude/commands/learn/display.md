@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Display Module — Visual Language
 
 *Loaded by teaching.md, quiz.md, and progress.md. Defines the formatting standard for all learner-facing output.*

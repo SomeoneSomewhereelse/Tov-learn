@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Security Module — סקירת אבטחה
 
 *Loaded when /learn is called with "security [URL]" or "security" argument, or when the deploy module offers a security check and the learner accepts.*

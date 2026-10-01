@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Quiz Module
 
 *Loaded when the "quiz me" trigger is used. TTS helper is defined in learn.md.*

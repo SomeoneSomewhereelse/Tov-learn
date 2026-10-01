@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Slides Module
 
 *Loaded when the learner types `/learn slides` or "slides" during a session. Switches to verbatim slide reading mode.*

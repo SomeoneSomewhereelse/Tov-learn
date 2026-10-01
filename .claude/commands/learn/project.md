@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Project Module
 
 *Loaded when /learn is called with "project" argument, or when learner picks the final project from resume.*

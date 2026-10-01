@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Import Module — ייבוא נתוני תלמיד
 
 Import learner data from a ZIP file (created by `/learn export`) into `~/skill-tutor-tutorials/`.

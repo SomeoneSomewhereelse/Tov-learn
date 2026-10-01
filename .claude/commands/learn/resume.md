@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Resume Module
 
 *Loaded when /learn is called with no arguments. Replaces the static "lesson or project analysis?" prompt with a smart suggestion based on actual progress.*

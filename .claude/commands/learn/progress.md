@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Progress Module
 
 *Loaded after covering at least one section, and on the "stop" command.*
