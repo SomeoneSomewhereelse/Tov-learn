@@ -43,7 +43,6 @@ This will:
 - Ask for your preferred session language (Hebrew / English)
 - Let you pick a course — the active course is **AI Dev** (default)
 - Optionally configure a TTS voice
-- Optionally install `/learn` globally so it works in other projects (off by default — most learners keep it repo-local)
 
 That's it. Type `/learn 0.1` to start the first lesson.
 
@@ -199,7 +198,6 @@ CLAUDE.md                   ← architecture overview for contributors
 1. Create `.claude/commands/learn/[module-name].md`
 2. Add a row to the modules table in `CLAUDE.md`
 3. Add a routing entry in `learn.md` (Step 2 — Route table)
-4. Update the global install command in `setup.md`
 
 ---
 

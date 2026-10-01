@@ -11,7 +11,7 @@
 | מודול | קובץ | תוכן |
 |-------|------|------|
 | Entry point + routing | `.claude/commands/learn.md` | Routing + TTS helper + Step 0-2 |
-| Setup | `.claude/commands/learn/setup.md` | הגדרות ראשוניות, קול, global install |
+| Setup | `.claude/commands/learn/setup.md` | הגדרות ראשוניות, קול |
 | Resume | `.claude/commands/learn/resume.md` | Smart entry — suggests next action based on progress |
 | Teaching | `.claude/commands/learn/teaching.md` | טעינת שיעור, Journey format, לולאת הוראה |
 | Quiz | `.claude/commands/learn/quiz.md` | בחינה, ציונים, spaced repetition |
@@ -72,4 +72,3 @@ architectures/[project-name].html     ← מפות ארכיטקטורה
 1. צור קובץ ב-`.claude/commands/learn/[module-name].md`
 2. הוסף שורה לטבלת ה-Modules למעלה
 3. הוסף routing ב-`learn.md` (Step 2 — Route table)
-4. (אופציונלי) אם ההתקנה הגלובלית מופעלת — עדכן את רשימת הקבצים שמועתקים ב-`setup.md` סעיף F. ברירת מחדל: `/learn` רץ מתוך הריפו בלבד, ללא התקנה גלובלית.

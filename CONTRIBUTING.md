@@ -58,7 +58,6 @@ Modules live in `.claude/commands/learn/`. Each module is a standalone markdown 
 1. Create `.claude/commands/learn/[module-name].md`
 2. Add a routing entry in `.claude/commands/learn.md` (Step 2 — Route table)
 3. Add a row to the modules table in `CLAUDE.md`
-4. Update the global install `Copy-Item` command in `setup.md`
 
 ---
 
