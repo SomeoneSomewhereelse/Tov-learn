@@ -84,4 +84,4 @@ architectures/[project-name].html     ← מפות ארכיטקטורה
 uv run ruff check -q && uv run pytest -q
 ```
 
-אם pytest אדום, הריצו שוב `uv run pytest -v` כדי לראות אילו בדיקות נכשלו. הבדיקות נמצאות ב-`tests/test_validate_structure.py`, והכללים שהן בודקות ב-`tests/validate_structure.py`.
+אם pytest אדום, הריצו שוב `uv run pytest -v` כדי לראות אילו בדיקות נכשלו. רוב הבדיקות קוראות רק קבצים ש-git מכיר (כמו ב-CI), אז הריצו `git add` על קבצים חדשים לפני הבדיקה, אחרת התוצאה המקומית תהיה שונה מזו של CI. הבדיקות נמצאות ב-`tests/test_validate_structure.py`, והכללים שהן בודקות ב-`tests/validate_structure.py`.
