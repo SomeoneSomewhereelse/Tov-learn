@@ -70,7 +70,7 @@ architectures/[project-name].html     ← מפות ארכיטקטורה
 ## הוספת מודול חדש
 
 1. צור קובץ ב-`.claude/commands/learn/[module-name].md`
-2. התחל את הקובץ בבלוק ה-frontmatter של `disable-model-invocation: true` (שלוש שורות: `---`, `disable-model-invocation: true`, `---`), כדי שקלוד לא יטען את המודול בעצמו
+2. התחל את הקובץ בבלוק ה-frontmatter של `disable-model-invocation: true` (שלוש שורות: `---`, `disable-model-invocation: true`, `---`), כדי שקלוד לא יפעיל את המודול כפקודה בעצמו
 3. הוסף שורה לטבלת ה-Modules למעלה
 4. הוסף routing ב-`learn.md` (Step 2 — Route table)
 
