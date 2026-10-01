@@ -19,6 +19,8 @@
    - `[X.Y]_exercises.md` — 2–4 exercises, one per concept
 4. Update `courses/[course-name]/COURSE.md` with the new lesson row
 
+**CI checks every lesson** (see `tests/validate_structure.py`): each script has at least 5 `[מעבר שקף]` markers; the exercises' first heading contains `שיעור X.Y`, and any `**שיעור:**` line names the same lesson; `COURSE.md` has a row for the lesson and a correct module range; and spoken lesson references (e.g. "שתיים נקודה אחת") name lessons that exist. The example below predates these rules; F rewrites it.
+
 **Script format:**
 ```
 Title: [Lesson Title]

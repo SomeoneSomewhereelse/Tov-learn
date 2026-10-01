@@ -72,7 +72,7 @@ To start a lesson:
 /learn 0.1
 ```
 
-The tutor loads the script, greets you, asks what you already know, and walks through each section interactively. At any point you can type `quiz me` to test yourself, or `stop` to end the session and get a next-step recommendation.
+The tutor loads the script, greets you, asks what you already know, and walks through each section interactively. At any point you can type `quiz me` (or `בוחן`) to test yourself, or `stop` (or `עצור` / `סיום`) to end the session and get a next-step recommendation.
 
 ### Analyzing your own project
 
@@ -117,12 +117,12 @@ Generates an HTML file at `~/skill-tutor-tutorials/dashboard.html` showing all l
 
 | Command | Action |
 |---------|--------|
-| `continue` | Move to the next section |
-| `quiz me` | 4-question quiz on everything covered so far |
+| `continue` / `המשך` | Move to the next section |
+| `quiz me` / `בוחן` | 4-question quiz on everything covered so far |
 | `explain again` | Re-explain current section from a different angle |
 | `summary` | Bullet-point recap of what was covered |
 | `exercises` | Show this lesson's exercises |
-| `stop` | End session — shows what's covered, what's left, next recommendation |
+| `stop` / `עצור` / `סיום` | End session — shows what's covered, what's left, next recommendation |
 | `read aloud` | Speak the last response (on-demand TTS) |
 | `settings` | Show current language, TTS, and course path |
 
