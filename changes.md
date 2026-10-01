@@ -179,7 +179,7 @@ Corrects outdated API details in lessons 2.5 and 2.6.
 
 ## 1. Lesson 2.5 exercise 3 (currency converter)
 
-**Before:** the exercise called a defunct Bank of Israel endpoint and read a `rate` field that no longer exists; the instructions converted in the wrong direction.
+**Before:** the exercise called a defunct Bank of Israel endpoint and read a `rate` field that no longer exists; the instructions didn't say which way to convert (the rate is shekels per dollar).
 
 **After:** it calls `https://boi.org.il/PublicApi/GetExchangeRate?key=USD`, reads `currentExchangeRate` divided by `unit`, and states that the rate is shekels per one dollar, so shekels ÷ rate = dollars.
 
