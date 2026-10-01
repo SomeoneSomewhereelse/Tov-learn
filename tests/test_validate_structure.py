@@ -5,6 +5,7 @@ Every fixture test calls the checks through ``fixture_checks()``, which binds
 ``test_real_repo_passes`` uses the default ``SPOKEN_ALLOWLIST``.
 """
 
+import os
 import shutil
 import subprocess
 from functools import partial
@@ -419,7 +420,9 @@ def test_must_pass_negative(good_tree: Path, mutate) -> None:
 
 
 def git_repo(path: Path):
-    return partial(subprocess.run, cwd=path, check=True, capture_output=True)
+    """git in ``path``, ignoring the user's global and system git config."""
+    env = {**os.environ, "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull}
+    return partial(subprocess.run, cwd=path, env=env, check=True, capture_output=True)
 
 
 @pytest.mark.skipif(shutil.which("git") is None, reason="git not installed")
