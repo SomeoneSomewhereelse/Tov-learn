@@ -196,8 +196,9 @@ CLAUDE.md                   ← architecture overview for contributors
 ## Adding a New Module
 
 1. Create `.claude/commands/learn/[module-name].md`
-2. Add a row to the modules table in `CLAUDE.md`
-3. Add a routing entry in `learn.md` (Step 2 — Route table)
+2. Start the file with the `disable-model-invocation: true` frontmatter block (three lines: `---`, `disable-model-invocation: true`, `---`), so Claude never loads the module on its own
+3. Add a row to the modules table in `CLAUDE.md`
+4. Add a routing entry in `learn.md` (Step 2 — Route table)
 
 ---
 

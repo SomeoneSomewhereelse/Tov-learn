@@ -56,8 +56,9 @@ Modules live in `.claude/commands/learn/`. Each module is a standalone markdown 
 
 **To add a new module:**
 1. Create `.claude/commands/learn/[module-name].md`
-2. Add a routing entry in `.claude/commands/learn.md` (Step 2 — Route table)
-3. Add a row to the modules table in `CLAUDE.md`
+2. Start the file with the `disable-model-invocation: true` frontmatter block (three lines: `---`, `disable-model-invocation: true`, `---`), so Claude never loads the module on its own
+3. Add a routing entry in `.claude/commands/learn.md` (Step 2 — Route table)
+4. Add a row to the modules table in `CLAUDE.md`
 
 ---
 
