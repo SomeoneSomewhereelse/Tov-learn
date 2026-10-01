@@ -9,6 +9,18 @@ Respond in `session.language` throughout. Address the learner using `session.add
 
 ---
 
+## Step 0 — TEMPORARY (until unit 1e)
+
+**Until unit 1e lands, this module runs only this step.**
+
+Tell the learner, in `session.language` and using `session.address`, that the final projects are being rebuilt, and that meanwhile they should continue with the lessons (`/learn`). Hebrew wording:
+
+> "פרויקטי הגמר נבנים מחדש כרגע. בינתיים, המשיכו עם השיעורים: `/learn`"
+
+Then **stop**. Do not open the final-projects file (`projects.md`), do not look for a project state file, and do not run Step 1 or any later step. Unit 1e deletes this step.
+
+---
+
 ## Step 1 — Load Project State
 
 Read `~/skill-tutor-tutorials/project/ai-dev-project.md`.

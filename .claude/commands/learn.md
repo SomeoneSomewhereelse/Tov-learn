@@ -103,7 +103,7 @@ Create `~/skill-tutor-tutorials/learner_profile.md` with their answers.
 | diagnostic / בחן אותי | Switch to diagnostic mode (quiz first, teach weak spots) |
 | socratic / הדרך אותי | Switch to socratic mode (question-led discovery) |
 | slides | Read `.claude/commands/learn/slides.md` — verbatim slide reading mode |
-| project | Read `.claude/commands/learn/project.md` — final project mode |
+| project | Read `.claude/commands/learn/project.md` — final projects (until unit 1e: shows 'being rebuilt') |
 | deploy | Read `.claude/commands/learn/deploy.md` — pick a deploy tool (GitHub Pages / Cloudflare / Render / Vercel) |
 | security | Read `.claude/commands/learn/security.md` — security review on the learner's project |
 | export | Read `.claude/commands/learn/export.md` — export all learner data to a ZIP |
