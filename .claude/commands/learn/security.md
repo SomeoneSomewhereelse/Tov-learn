@@ -17,8 +17,31 @@ A live URL reveals what code review misses: files that are actually served, head
 
 Parse `$ARGUMENTS` for a URL (starts with `http://` or `https://`).
 
-- **URL provided** → store as `target_url`, proceed to Phase A (Live Scan).
-- **No URL** → ask: "מה ה-URL של האפליקציה? (למשל: `https://my-app.onrender.com`). אם עוד לא העלית — הרץ `/learn deploy` קודם, ותחזור לכאן עם הכתובת."
+- **URL provided** → store as `target_url`, then run the ownership check below.
+- **No URL** → ask: "מה ה-URL של האפליקציה? (למשל: `https://my-app.onrender.com`). אם עוד לא העלית — הרץ `/learn deploy` קודם, ותחזור לכאן עם הכתובת." When the learner gives a URL, store it as `target_url`, then run the ownership check below.
+
+### Pre-flight — Ownership check (required on every entry path)
+
+Run this once `target_url` is known and before Phase A, however the learner got here: `/learn security http…`, `/learn security` followed by a URL, or the `deploy` module's handoff. **Make no network request of any kind before this check passes.**
+
+Use `AskUserQuestion`, in `session.language` (Hebrew shown):
+
+```
+question: "האפליקציה בכתובת הזו שלך, או שיש לך אישור מפורש לבדוק אותה?"
+header: "אישור בדיקה"
+options:
+  - label: "כן — היא שלי, או שיש לי אישור מפורש"
+    description: "ממשיכים לסריקה"
+  - label: "לא"
+    description: "לא סורקים את הכתובת הזו"
+```
+
+- **Only the first option continues** to Phase A.
+- **Any other answer** (including "לא", free text, or anything unclear):
+  - make no network request of any kind, and run none of Phases A–E
+  - explain briefly, in `session.language`, that testing an app without permission can cause harm and may be illegal
+  - suggest rerunning `/learn security` with the URL of an app the learner owns
+  - then **end** the module
 
 ---
 
@@ -129,16 +152,19 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 דפוס מינימלי לבדיקת סוד משותף:
 ```js
+const { createHash, timingSafeEqual } = require('node:crypto')
+const digest = (s) => createHash('sha256').update(String(s)).digest()
+
 const secret = process.env.SYNC_SECRET
 if (!secret) return res.status(503).json({ error: 'Service unavailable' })
 
 const provided = req.headers['x-sync-key']
-if (!provided || !timingSafeEqual(Buffer.from(provided), Buffer.from(secret))) {
+if (!provided || !timingSafeEqual(digest(provided), digest(secret))) {
   return res.status(401).json({ error: 'Unauthorized' })
 }
 ```
 
-הסבר `timingSafeEqual`: השוואה רגילה (`===`) פגיעה ל-timing attack — אפשר לנחש מפתח תו-תו לפי זמן התשובה. `timingSafeEqual` לוקח אותו זמן תמיד.
+הסבר `timingSafeEqual`: השוואה רגילה (`===`) פגיעה ל-timing attack — אפשר לנחש מפתח תו-תו לפי זמן התשובה. `timingSafeEqual` לוקח אותו זמן תמיד. **למה משווים digests:** `timingSafeEqual` זורק שגיאה כשהאורכים שונים, והשרת היה מחזיר 500 במקום 401 וחושף את אורך המפתח; ל-SHA-256 של שני הצדדים יש תמיד אותו אורך (32 בתים), ולכן אין 500 ואין דליפה של האורך.
 
 ---
 
