@@ -1,6 +1,6 @@
 # Stage 0 — Quick-Win PR: Design Spec
 
-**Date:** 2026-09-27 · **Revision:** 6.1 (2026-09-29), after five independent reviews and the plan review (§10) · **Status:** **locked** by the user (2026-09-29); rev 6.1 is editorial only (no decision changed). Plan: `docs/superpowers/plans/2026-09-29-stage0-quick-wins.md`
+**Date:** 2026-09-27 · **Revision:** 6.2 (2026-10-01), after five independent reviews, the plan review and the final branch review (§10) · **Status:** **locked** by the user (2026-09-29); rev 6.1 is editorial only (no decision changed). Rev 6.2 records the fixes from the final branch review (§10); it changes S5's guard, one lint rule and two content items. Plan: `docs/superpowers/plans/2026-09-29-stage0-quick-wins.md`
 **Parent:** `docs/prds/project-redesign-2026-09-25.md` (the PRD). References such as "D2 item 5", "§3" and "R14" point there. "Review §2.x" points to `docs/reviews/project-review-2026-09-24.md`. "RV-…" through "RV5-…" point to the spec reviews (§10).
 **Baseline:** `master` at `290af75` (= `origin/master`, after #12 and #13 were merged on 2026-09-28). Its tree is identical to the earlier local `d04ca2a` (tree `5bf8edb`), so every line number below refers to that tree.
 **Scope:** Stage 0 only:
@@ -330,6 +330,7 @@ All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n--
    ```
    - **The whole move runs as one single Bash (or PowerShell) tool invocation**, never split across calls, because shell variables don't survive between tool calls. The block guards `: "${dest:?}"` right after computing `dest`, before the first `mv` (RV5-M5).
    - `mv` moves a symlink as a link and never follows it. PowerShell uses `Move-Item -LiteralPath … -ErrorAction Stop`, after checking `$HOME` and `$dest` are non-empty.
+   - **Never inside the repo, even through a symlinked parent (final-review M2).** A tester may have linked `~/.claude/commands` to the repo's `.claude/commands`; `mv "$HOME/.claude/commands/learn.md"` would then move the repo's own file. Both Step 1 (find) and Step 3 (move) first resolve each path's real parent folder (`cd -P … && pwd -P`; in PowerShell, any link among the parents whose target lies inside `git rev-parse --show-toplevel`). A path whose real location is inside the repo prints `SKIP …`, is never counted, never moved and never reported as `STILL PRESENT`. Moving the final path component itself (a link) is still allowed.
    - On any error: stop and report. Never retry with force, and never delete.
    - **Across filesystems (RV3-M4).** If a source sits on another filesystem (e.g. `~/.claude/commands` symlinked to `/mnt/c/…`), `mv` copies and then removes the original. An interruption leaves the original intact, or both copies, but never neither. The step claims "nothing is lost", not "nothing is unlinked".
 5. **Verify and report.** Each original path is gone and present in the backup. The backup's **entry counts, taken the same no-follow way, equal the counts shown in step 2** (RV3-M4, RV4-L4). Print the backup path.
@@ -402,7 +403,7 @@ Written once, as the last commit of group D, appended after the existing section
 - **Course scope:** `courses/*/` except `courses/_archive/`, skipping `old_B*` files.
 - **File discovery (RV2-L8):** a helper `repo_files(root, pattern)`:
   - uses `git ls-files -z` when `root/.git` exists, **as a file or a directory** (in a worktree `.git` is a file; RV5-L4), so local results match CI, and non-ASCII paths come out unquoted. Entries missing on disk (deleted in the working tree) are skipped (RV4-L10)
-  - otherwise walks the filesystem (the pytest fixture trees)
+  - otherwise walks the filesystem (the pytest fixture trees), and so does a repo whose `git` executable is missing (final-review L4)
 
 | Check | Rule |
 |---|---|
@@ -413,7 +414,7 @@ Written once, as the last commit of group D, appended after the existing section
 | `course_name_denylist` | No `קורס\s+(ה-)?AI Engineer`, `\*\*קורס:\*\*\s*AI Engineer` or `AI Engineer course` (case-insensitive) in course scope. The job title passes. **Plus (S19):** `NEXT_PUBLIC_SUPABASE_ANON_KEY`. The check keeps its name, since F renames it into the full denylist |
 | `tutor_refs` | In `.claude/**/*.md`:<br>(a) backticked paths starting with `.claude/` or `courses/` exist, except `LOCAL_ONLY = {".claude/settings.local.json"}`<br>(b) a backticked bare `name.md` directly after a word-bounded `Read`/`Load` (any case) exists in the referring file's folder<br>Skips `~/…` and placeholders (`[`, `{`, `*`, `X.Y`). **`${CLAUDE_SKILL_DIR}` resolution is M's extension (§9; RV2-M4)** |
 | `settings_json` | `.claude/settings.json`, if present, parses, and contains no `powershell` (case-insensitive) |
-| `relative_links` | In every tracked `*.md`, after removing fenced blocks and inline code spans, every `[text](target)` that isn't `http:`/`https:`/`mailto:`/`#…` resolves (after stripping `#fragment`). Skips `_archive/` and `old_B*` |
+| `relative_links` | In every tracked `*.md`, after removing fenced blocks and inline code spans, every `[text](target)` that isn't `http:`/`https:`/`mailto:`/`#…` resolves (after stripping `#fragment`; a target starting with `/` is relative to the repo root, as on GitHub). Skips `_archive/` and `old_B*` |
 | `clean_slate_no_delete` | *Temporary.* Between the CLEAN-SLATE markers in `setup.md`, matched **case-insensitively** (PowerShell ignores case; RV5-L2): no `\brm\b`, `\brmdir\b`, `\bdel\b`, `\berase\b`, `\brd\b`, `\bri\b`, `Remove-Item`, `\bunlink\b`, `-delete\b`, `rmtree`, `::Delete\(`. **Both markers must be present in `setup.md`; a missing marker is a finding** (RV3-M5). The check is deleted together with the section at the gate |
 | `lesson_files` *(existing)* | Every lesson folder has `*_script.txt` and `*_exercises.md`; course-scoped |
 | `teaching_step5` *(existing)* | `teaching.md` contains "Step 5" |
@@ -437,7 +438,7 @@ Written once, as the last commit of group D, appended after the existing section
   - `course_name_denylist`: `בקורס AI Engineer`; `- **קורס:** AI Engineer`; `NEXT_PUBLIC_SUPABASE_ANON_KEY`
   - `tutor_refs`: a missing `.claude/…` route; `Read \`missing.md\``
   - `settings_json`: `powershell`; invalid JSON
-  - `relative_links`: a missing target
+  - `relative_links`: a missing target; a root-absolute link (`/docs/gone.md`) to a missing file
   - `clean_slate_no_delete`: `rm -rf`; `Remove-Item`; lower-case `remove-item`; `[IO.Directory]::Delete(`; the END marker missing
   - `lesson_files`: missing exercises
   - `teaching_step5`: "Step 5" removed
@@ -446,11 +447,13 @@ Written once, as the last commit of group D, appended after the existing section
   - denied strings in `_archive/` and `old_B-x.md`
   - `~/…`; `.claude/settings.local.json`; `${CLAUDE_SKILL_DIR}/x.md`
   - "already … `x.md`"; "load … from `projects.md`"
+  - a root-absolute link (`/README.md`) that resolves
   - `http(s)` and `#anchor` links; a broken link in a code fence and in inline code
   - spelled numbers followed by `,` `:` `.`
   - an allowlisted phrase; a spoken reference to an existing lesson
   - "Confirm", "model" and "perform" between the markers; `rm` outside them
   - a missing `settings.json`
+- **Behavioural tests of the clean-slate blocks (final-review M2).** They run the real bash blocks of `setup.md` Steps 1 and 3 against a fake `HOME` and a fake repo: a symlinked `~/.claude/commands` leaves the repo's files alone; a real global install is still moved; the find step prints `SKIP`. A further test makes `repo_files` fall back to walking when `git` is missing, and `test_worktree_git_file` pins `commit.gpgsign=false` and `core.hooksPath=/dev/null`.
 - **`test_real_repo_passes`:** every check on the real repo, with the findings in the assertion message. Red until groups C and T land: it turns green at the T5 (clean-slate) commit, and group D must keep it green.
 
 ### 5.3 Toolchain files
@@ -771,6 +774,23 @@ A fresh Opus 5.5 Plan agent (single, read-only, no context; told to ignore the d
 | RV5-L7 | `progress.md` keys on "stop" only | Two trigger lines edited |
 | RV5-L8 | Approval location is version-dependent | "from v2.1.211" |
 | RV5-L9 | Small inconsistencies (CONTRIBUTING wording, done-when mapping, S18 and docs PR, line shifts, lab location) | Each fixed in place |
+
+### Final branch review (2026-10-01, rev 6.2)
+A fresh single-agent Opus 5.5 review of the finished branch raised 2 Medium and 10 Low findings. The user approved fixing all of them, each as its own commit.
+
+| # | Finding | Resolution |
+|---|---|---|
+| FR-M1 | `0.4_script.txt` still named "Module One: Business Automations" (Make.com) and a "Module Five". §4.2's inventory missed them, and RV4/RV5 reported no content gaps | Both lines now name Module 01 (Claude Code) and Module 02 (Claude API) |
+| FR-M2 | The clean-slate move could move the repo's own files through a symlinked `~/.claude/commands` | §4.3 guard (`SKIP`), behavioural tests |
+| FR-L1 | `changes.md` #13 misdescribed the old exercise | Reworded |
+| FR-L2 | `git ls-files` makes untracked files invisible locally but not in CI | CLAUDE.md and CONTRIBUTING say `git add` first |
+| FR-L3 | `test_worktree_git_file` depended on the global git config | Signing and hooks pinned off |
+| FR-L4 | Root-absolute links; a missing `git` executable | §5.1 |
+| FR-L5 | P1's commit message says "C, T and D" | Plan template fixed; the commit is not rewritten |
+| FR-L6, L7 | Wrong test file named; the frontmatter claim was too strong | Reworded |
+| FR-L8 | `1.1_script.txt:1` "אחת נקודה אחד"; masculine "מודול אחת" | The first is fixed; the second is left for the Hebrew reviewer |
+| FR-L9 | The step-0 prompt called live progress "a previous install" | Prompt reworded |
+| FR-L10 | 1.6 omitted the project-scope approval prompt | One sentence added |
 
 ### Plan review (2026-09-29, rev 6.1)
 A fresh single-agent review of the implementation plan also reported four editorial inconsistencies in this spec. All were fixed in place, and no decision changed. Its plan findings were fixed in the plan.

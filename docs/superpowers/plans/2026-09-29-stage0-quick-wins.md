@@ -12,6 +12,26 @@
 
 **How this plan was checked (2026-09-29):** the validator and the tests below were run with uv 0.12.19, pytest 9.1.1 and ruff 0.16.9 against a clone of the docs branch. Every edit block in Tasks 2–22 was then applied in order to a second clone, and the real-repo finding count after each task matched the **Expected** line of that task. The fixed tree ended with 0 findings, `ruff check` clean, and 58 tests passing. This plan file itself passes `relative_links`. A fresh single-agent review of this plan (2026-09-29) found no High issues. Its 2 Medium and 6 Low findings are fixed here: sentinel-guarded cleanup and a settings hash at every manual check, the Task 1 Step 5 expectation, abort recovery, commit authorization in Task 0, the CI-run race, and PowerShell dangling links. Its 4 spec findings are fixed in spec rev 6.1 (§10, PR-S1–S4). The dry run above was repeated after the fixes.
 
+## Post-implementation amendments (rev 6.2, 2026-10-01)
+
+The plan was executed inline, then one fresh Opus 5.5 reviewer read the whole branch (Task 23 Step 4). The user approved fixing every finding, as separate commits after the 22 plan commits. The task text below is otherwise unchanged and describes the original run. Where it disagrees with this section, this section wins:
+
+| Finding | Fix | Where |
+|---|---|---|
+| M1 | `0.4_script.txt` still promised "Module One: Business Automations" with Make.com, and a "Module Five". Both now name the real modules (01 Claude Code, 02 Claude API). It is a spec gap (§4.2 listed only 0.4's title, "Lesson 0.3" and course line) | content commit |
+| M2 | Clean-slate (Task 14) moved the repo's own tutor files when `~/.claude/commands` is a symlink into the repo. Steps 1 and 3 (bash and PowerShell) now resolve the real parent folder and print `SKIP` for any path inside the repo. Three behavioural tests run the real bash blocks against a fake HOME | `setup.md`, tests |
+| L1 | `changes.md` #13 "Before" said the instructions converted the wrong way. They gave no direction | `changes.md` |
+| L2 | CLAUDE.md and CONTRIBUTING tell contributors to `git add` new files before running the tests | docs |
+| L3 | `test_worktree_git_file` pins `commit.gpgsign=false` and `core.hooksPath=/dev/null` | tests |
+| L4 | `check_relative_links` treats `/x.md` as relative to the repo root; `repo_files` falls back to walking when `git` isn't installed | validator, tests |
+| L5 | Commit `3ddce85` says "groups C, T and D". The template in Task 1 Step 10 now says "C and T". The commit's message isn't rewritten (a rebase would change 30+ hashes for a cosmetic fix) | plan text |
+| L6, L7 | CLAUDE.md names the right test file; the three "add a module" docs say the flag stops the model invoking the module as a command, not that Claude never loads it | docs |
+| L8 | `1.1_script.txt:1` "אחת נקודה אחד" becomes "אחת נקודה אחת". The masculine "מודול אחת" (five places) is left for the Hebrew reviewer | content |
+| L9 | The clean-slate prompt says the data may include the tester's live progress | `setup.md` |
+| L10 | 1.6 mentions the first-use approval of a project-scoped MCP server | content |
+
+**What changes in the numbers.** The code blocks in Tasks 1 and 14 are the first-run versions. The finished branch has 64 tests (58 + 3 clean-slate + `root-absolute-link` + `root-absolute-missing` + the missing-git fallback), not 58. Every "58" below is the original run's count; the final evidence is `64 passed`, ruff silent, `0 finding(s)`. The branch is 22 plan commits plus 11 review-fix commits. Manual check 3 is unchanged: `test_clean_slate_move_leaves_the_repo_alone` covers the symlink case without touching the user's `$HOME`.
+
 ## Global Constraints
 
 - **Baseline:** `master` at `290af750671abf35342fc2c4ee131f0e0db89130` (after #12 and #13). Line numbers here refer to that tree, and edits anchor on quoted text, not line numbers (spec §1, RV5-L9).
@@ -1278,7 +1298,7 @@ uv run python "$SCRATCH/findings.py" > "$SCRATCH/p1-findings.txt"
   echo "actions (checkout v7.0.1, setup-uv v10.2.0) with contents: read; Dependabot"
   echo "tracks github-actions weekly."
   echo
-  echo "test_real_repo_passes is red until groups C, T and D land. Red findings:"
+  echo "test_real_repo_passes is red until groups C and T land. Red findings:"
   echo
   cat "$SCRATCH/p1-findings.txt"
   echo
