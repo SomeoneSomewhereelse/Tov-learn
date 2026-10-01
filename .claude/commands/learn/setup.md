@@ -19,7 +19,7 @@ Leftovers from an earlier install fail quietly: a personal `~/.claude/commands/l
 **Hard rules for this section:**
 - Look at exactly three paths, and nothing else: `~/skill-tutor-tutorials/`, `~/.claude/commands/learn.md` and `~/.claude/commands/learn/`. No globs, no other names.
 - Always build them from `$HOME`. Never use a relative path: this repo has its own skill-tutor-tutorials folder, which must never be touched.
-- Never touch anything inside this repo. That includes the repo's local settings file (.claude/settings.local.json) and the repo's own skill-tutor-tutorials folder.
+- Never touch anything inside this repo. That includes the repo's local settings file (.claude/settings.local.json) and the repo's own skill-tutor-tutorials folder. A path counts as inside this repo when its real location is inside it, after resolving symlinked parent folders: a tester may have linked `~/.claude/commands` to this repo's `.claude/commands`. The blocks below check this and print `SKIP` for such a path. Leave a `SKIP` path alone.
 - Never touch an earlier backup folder (`~/skill-tutor-tutorials-backup-…`).
 - Move, never destroy. This section has no command that destroys files, and you must not run one. If any step fails, stop and report the error. Never retry with force.
 - When in doubt, keep.
@@ -30,8 +30,15 @@ Run this as **one** Bash tool call (on native Windows without Git Bash, run the 
 
 ```bash
 : "${HOME:?HOME is not set}"
+repo=$(cd -P "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" && pwd -P)
+inside_repo() {
+  d=$(cd -P "$(dirname "$1")" 2>/dev/null && pwd -P) || return 1
+  case "$d/$(basename "$1")" in "$repo"/*) return 0 ;; esac
+  return 1
+}
 for p in "$HOME/skill-tutor-tutorials" "$HOME/.claude/commands/learn.md" "$HOME/.claude/commands/learn"; do
   if [ -e "$p" ] || [ -L "$p" ]; then
+    if inside_repo "$p"; then echo "SKIP $p (its real location is inside this repo)"; continue; fi
     echo "FOUND $p"
     echo "  entries: $(find "$p" | wc -l | tr -d ' ')"
     echo "  newest:  $(find "$p" -exec ls -ldt {} + | head -n 1)"
@@ -50,8 +57,25 @@ function Get-Entries([string]$Path) {
     Get-ChildItem -LiteralPath $Path -Force | ForEach-Object { Get-Entries $_.FullName }
   }
 }
+function Test-InRepo([string]$Path) {
+  $repo = git rev-parse --show-toplevel 2>$null
+  if (-not $repo) { $repo = (Get-Location).Path }
+  $repo = (Resolve-Path -LiteralPath $repo).ProviderPath
+  $d = Split-Path -Parent $Path
+  while ($d -and ($d -ne $HOME) -and (Test-Path -LiteralPath $d)) {
+    $it = Get-Item -LiteralPath $d -Force
+    if ($it.LinkType) {
+      $t = @($it.Target)[0]
+      if (-not [System.IO.Path]::IsPathRooted($t)) { $t = Join-Path (Split-Path -Parent $d) $t }
+      if ([System.IO.Path]::GetFullPath($t).StartsWith($repo, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+    }
+    $d = Split-Path -Parent $d
+  }
+  return $false
+}
 foreach ($p in @((Join-Path $HOME 'skill-tutor-tutorials'), (Join-Path $HOME '.claude\commands\learn.md'), (Join-Path $HOME '.claude\commands\learn'))) {
   if (Get-Item -LiteralPath $p -Force -ErrorAction SilentlyContinue) {
+    if (Test-InRepo $p) { "SKIP $p (its real location is inside this repo)"; continue }
     $entries = @(Get-Entries $p)
     "FOUND $p"
     "  entries: $($entries.Count)"
@@ -63,7 +87,8 @@ foreach ($p in @((Join-Path $HOME 'skill-tutor-tutorials'), (Join-Path $HOME '.c
 
 - `find` without `-L` never follows a symlink: a symlink counts as **one** entry, and its target is printed next to it. The bash block uses only commands that behave the same on GNU (Linux, WSL) and BSD (macOS). The PowerShell block uses `Get-Item -Force`, which also finds a dangling symlink.
 - The entry count is always exact. For a very large folder, `find … -exec ls -ldt {} +` can split into batches, so the "newest" line is then only approximate.
-- **If nothing is found:** say, in Hebrew, "לא נמצאו שאריות מהתקנה קודמת." and continue to section 0.1.
+- A `SKIP` line is not a leftover: its real location is inside this repo, so ignore it everywhere below. Count only the `FOUND` paths.
+- **If nothing is found** (no `FOUND` line): say, in Hebrew, "לא נמצאו שאריות מהתקנה קודמת." and continue to section 0.1.
 - **Otherwise:** show each path found with its entry count, its newest modification date and any symlink targets, and remember the counts for Step 4.
 
 ### Step 2 — Ask
@@ -91,13 +116,25 @@ Run the whole move as **one single** Bash tool call (or one PowerShell call), ne
 ts=$(date +%Y%m%d-%H%M%S)
 dest="$HOME/skill-tutor-tutorials-backup-$ts"
 : "${dest:?dest is not set}"
+repo=$(cd -P "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" && pwd -P)
+inside_repo() {
+  d=$(cd -P "$(dirname "$1")" 2>/dev/null && pwd -P) || return 1
+  case "$d/$(basename "$1")" in "$repo"/*) return 0 ;; esac
+  return 1
+}
+move_aside() {
+  if [ -e "$1" ] || [ -L "$1" ]; then
+    if inside_repo "$1"; then echo "SKIP $1 (its real location is inside this repo)"; return 0; fi
+    mv "$1" "$2" || exit 1
+  fi
+}
 mkdir "$dest" && mkdir "$dest/commands" || exit 1
-if [ -e "$HOME/skill-tutor-tutorials" ] || [ -L "$HOME/skill-tutor-tutorials" ]; then mv "$HOME/skill-tutor-tutorials" "$dest/" || exit 1; fi
-if [ -e "$HOME/.claude/commands/learn.md" ] || [ -L "$HOME/.claude/commands/learn.md" ]; then mv "$HOME/.claude/commands/learn.md" "$dest/commands/" || exit 1; fi
-if [ -e "$HOME/.claude/commands/learn" ] || [ -L "$HOME/.claude/commands/learn" ]; then mv "$HOME/.claude/commands/learn" "$dest/commands/" || exit 1; fi
+move_aside "$HOME/skill-tutor-tutorials" "$dest/"
+move_aside "$HOME/.claude/commands/learn.md" "$dest/commands/"
+move_aside "$HOME/.claude/commands/learn" "$dest/commands/"
 echo "BACKUP $dest"
 for p in "$HOME/skill-tutor-tutorials" "$HOME/.claude/commands/learn.md" "$HOME/.claude/commands/learn"; do
-  if [ -e "$p" ] || [ -L "$p" ]; then echo "STILL PRESENT $p"; fi
+  if { [ -e "$p" ] || [ -L "$p" ]; } && ! inside_repo "$p"; then echo "STILL PRESENT $p"; fi
 done
 for b in "$dest/skill-tutor-tutorials" "$dest/commands/learn.md" "$dest/commands/learn"; do
   if [ -e "$b" ] || [ -L "$b" ]; then echo "IN BACKUP $b entries: $(find "$b" | wc -l | tr -d ' ')"; fi
@@ -114,6 +151,22 @@ function Get-Entries([string]$Path) {
     Get-ChildItem -LiteralPath $Path -Force | ForEach-Object { Get-Entries $_.FullName }
   }
 }
+function Test-InRepo([string]$Path) {
+  $repo = git rev-parse --show-toplevel 2>$null
+  if (-not $repo) { $repo = (Get-Location).Path }
+  $repo = (Resolve-Path -LiteralPath $repo).ProviderPath
+  $d = Split-Path -Parent $Path
+  while ($d -and ($d -ne $HOME) -and (Test-Path -LiteralPath $d)) {
+    $it = Get-Item -LiteralPath $d -Force
+    if ($it.LinkType) {
+      $t = @($it.Target)[0]
+      if (-not [System.IO.Path]::IsPathRooted($t)) { $t = Join-Path (Split-Path -Parent $d) $t }
+      if ([System.IO.Path]::GetFullPath($t).StartsWith($repo, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+    }
+    $d = Split-Path -Parent $d
+  }
+  return $false
+}
 $dest = Join-Path $HOME ('skill-tutor-tutorials-backup-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
 if (-not $dest) { throw 'dest is not set' }
 New-Item -ItemType Directory -Path $dest | Out-Null
@@ -124,10 +177,13 @@ $moves = @(
   @((Join-Path $HOME '.claude\commands\learn'), (Join-Path $dest 'commands'))
 )
 foreach ($m in $moves) {
-  if (Get-Item -LiteralPath $m[0] -Force -ErrorAction SilentlyContinue) { Move-Item -LiteralPath $m[0] -Destination $m[1] -ErrorAction Stop }
+  if (Get-Item -LiteralPath $m[0] -Force -ErrorAction SilentlyContinue) {
+    if (Test-InRepo $m[0]) { "SKIP $($m[0]) (its real location is inside this repo)"; continue }
+    Move-Item -LiteralPath $m[0] -Destination $m[1] -ErrorAction Stop
+  }
 }
 "BACKUP $dest"
-foreach ($m in $moves) { if (Get-Item -LiteralPath $m[0] -Force -ErrorAction SilentlyContinue) { "STILL PRESENT $($m[0])" } }
+foreach ($m in $moves) { if ((Get-Item -LiteralPath $m[0] -Force -ErrorAction SilentlyContinue) -and -not (Test-InRepo $m[0])) { "STILL PRESENT $($m[0])" } }
 foreach ($b in @((Join-Path $dest 'skill-tutor-tutorials'), (Join-Path $dest 'commands\learn.md'), (Join-Path $dest 'commands\learn'))) {
   if (Get-Item -LiteralPath $b -Force -ErrorAction SilentlyContinue) { "IN BACKUP $b entries: $(@(Get-Entries $b).Count)" }
 }
@@ -139,7 +195,7 @@ foreach ($b in @((Join-Path $dest 'skill-tutor-tutorials'), (Join-Path $dest 'co
 
 ### Step 4 — Verify and report
 
-Check the output: no `STILL PRESENT` line, and each `IN BACKUP` entry count equals the count shown in Step 1. If anything differs, stop and report it. Otherwise tell the learner, in Hebrew, the backup path from the `BACKUP` line.
+Check the output: no `STILL PRESENT` line (a `SKIP` path is not one), and each `IN BACKUP` entry count equals the count shown in Step 1. If anything differs, stop and report it. Otherwise tell the learner, in Hebrew, the backup path from the `BACKUP` line.
 
 ### Step 5 — Continue or stop
 

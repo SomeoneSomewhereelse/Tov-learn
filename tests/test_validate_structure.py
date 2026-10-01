@@ -494,6 +494,91 @@ def test_worktree_git_file(good_tree: Path, tmp_path_factory) -> None:
     assert run_all(wt) == {name: [] for name in fixture_checks()}
 
 
+def clean_slate_block(heading: str) -> str:
+    """The first bash block under ``heading`` in the real setup.md."""
+    text = (REPO_ROOT / SETUP).read_text(encoding="utf-8")
+    section = text.split(heading, 1)[1]
+    return section.split("```bash\n", 1)[1].split("```", 1)[0]
+
+
+def clean_slate_home(tmp_path: Path, *, link_commands: bool):
+    """A fake HOME with learner data, and a fake repo holding tutor files.
+
+    With ``link_commands``, ``~/.claude/commands`` is a symlink into the repo
+    (a tester who made the repo's commands global that way). Otherwise it is a
+    real folder with a real old global install.
+    """
+    home, repo = tmp_path / "home", tmp_path / "repo"
+    (home / "skill-tutor-tutorials").mkdir(parents=True)
+    (home / "skill-tutor-tutorials" / "settings.json").write_text("{}", encoding="utf-8")
+    (repo / ".claude" / "commands" / "learn").mkdir(parents=True)
+    (repo / ".claude" / "commands" / "learn.md").write_text("# router\n", encoding="utf-8")
+    (repo / ".claude" / "commands" / "learn" / "x.md").write_text("# x\n", encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True, capture_output=True)
+    (home / ".claude").mkdir()
+    if link_commands:
+        (home / ".claude" / "commands").symlink_to(repo / ".claude" / "commands")
+    else:
+        shutil.copytree(repo / ".claude" / "commands", home / ".claude" / "commands")
+    return home, repo
+
+
+def run_clean_slate(block: str, home: Path, repo: Path):
+    env = {"PATH": "/usr/bin:/bin:/usr/local/bin", "HOME": str(home)}
+    return subprocess.run(
+        ["bash", "-c", block],
+        cwd=repo,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+needs_bash_git = pytest.mark.skipif(
+    shutil.which("bash") is None or shutil.which("git") is None,
+    reason="bash and git are required",
+)
+
+
+@needs_bash_git
+def test_clean_slate_move_leaves_the_repo_alone(tmp_path: Path) -> None:
+    """RV-final M2: a symlinked ~/.claude/commands must not drag the repo's files away."""
+    home, repo = clean_slate_home(tmp_path, link_commands=True)
+    result = run_clean_slate(clean_slate_block("### Step 3"), home, repo)
+    assert result.returncode == 0, result.stderr
+    assert (repo / ".claude" / "commands" / "learn.md").is_file()
+    assert (repo / ".claude" / "commands" / "learn" / "x.md").is_file()
+    assert not (home / "skill-tutor-tutorials").exists()
+    (backup,) = home.glob("skill-tutor-tutorials-backup-*")
+    assert (backup / "skill-tutor-tutorials" / "settings.json").is_file()
+    assert not (backup / "commands" / "learn.md").exists()
+    assert "STILL PRESENT" not in result.stdout
+
+
+@needs_bash_git
+def test_clean_slate_move_takes_a_real_global_install(tmp_path: Path) -> None:
+    home, repo = clean_slate_home(tmp_path, link_commands=False)
+    result = run_clean_slate(clean_slate_block("### Step 3"), home, repo)
+    assert result.returncode == 0, result.stderr
+    (backup,) = home.glob("skill-tutor-tutorials-backup-*")
+    assert (backup / "commands" / "learn.md").is_file()
+    assert (backup / "commands" / "learn" / "x.md").is_file()
+    assert not (home / ".claude" / "commands" / "learn.md").exists()
+    assert (repo / ".claude" / "commands" / "learn.md").is_file()
+
+
+@needs_bash_git
+def test_clean_slate_find_skips_paths_inside_the_repo(tmp_path: Path) -> None:
+    home, repo = clean_slate_home(tmp_path, link_commands=True)
+    result = run_clean_slate(clean_slate_block("### Step 1"), home, repo)
+    assert result.returncode == 0, result.stderr
+    lines = result.stdout.splitlines()
+    assert f"FOUND {home}/skill-tutor-tutorials" in lines
+    assert sum(line.startswith("SKIP ") for line in lines) == 2
+    assert not [line for line in lines if line.startswith("FOUND ") and "commands" in line]
+
+
 def test_real_repo_passes() -> None:
     findings = [f for check in vs.CHECKS for f in check(REPO_ROOT)]
     assert not findings, f"{len(findings)} finding(s):\n" + "\n".join(findings)
