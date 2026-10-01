@@ -606,6 +606,26 @@ def test_repo_files_without_git_falls_back_to_walking(
     assert Path("README.md") in vs.repo_files(good_tree, "**/*.md")
 
 
+@needs_bash_git
+@pytest.mark.parametrize("step", ["### Step 1", "### Step 3"])
+def test_clean_slate_skips_a_folder_that_contains_the_repo(
+    tmp_path: Path, step: str
+) -> None:
+    """Review 2 M1: a clone inside ~/skill-tutor-tutorials must not be moved with it."""
+    home = tmp_path / "home"
+    repo = home / "skill-tutor-tutorials" / "Tov-learn"
+    (repo / ".claude").mkdir(parents=True)
+    (repo / ".claude" / "keep.md").write_text("# keep\n", encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True, capture_output=True)
+    result = run_clean_slate(clean_slate_block(step), home, repo)
+    assert result.returncode == 0, result.stderr
+    assert (repo / ".claude" / "keep.md").is_file()
+    assert not list(home.glob("skill-tutor-tutorials-backup-*/skill-tutor-tutorials"))
+    lines = result.stdout.splitlines()
+    assert any(line.startswith(f"SKIP {home}/skill-tutor-tutorials ") for line in lines)
+    assert "STILL PRESENT" not in result.stdout
+
+
 def test_real_repo_passes() -> None:
     findings = [f for check in vs.CHECKS for f in check(REPO_ROOT)]
     assert not findings, f"{len(findings)} finding(s):\n" + "\n".join(findings)

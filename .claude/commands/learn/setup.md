@@ -19,7 +19,7 @@ Leftovers from an earlier install fail quietly: a personal `~/.claude/commands/l
 **Hard rules for this section:**
 - Look at exactly three paths, and nothing else: `~/skill-tutor-tutorials/`, `~/.claude/commands/learn.md` and `~/.claude/commands/learn/`. No globs, no other names.
 - Always build them from `$HOME`. Never use a relative path: this repo has its own skill-tutor-tutorials folder, which must never be touched.
-- Never touch anything inside this repo. That includes the repo's local settings file (.claude/settings.local.json) and the repo's own skill-tutor-tutorials folder. A path counts as inside this repo when its real location is inside it, after resolving symlinked parent folders: a tester may have linked `~/.claude/commands` to this repo's `.claude/commands`. The blocks below check this and print `SKIP` for such a path. Leave a `SKIP` path alone.
+- Never touch anything inside this repo. That includes the repo's local settings file (.claude/settings.local.json) and the repo's own skill-tutor-tutorials folder. A path counts as inside this repo when its real location is inside it, after resolving symlinked parent folders, and also when this repo lives inside the path (a clone placed in `~/skill-tutor-tutorials/`, say): a tester may have linked `~/.claude/commands` to this repo's `.claude/commands`. The blocks below check this and print `SKIP` for such a path. Leave a `SKIP` path alone.
 - Never touch an earlier backup folder (`~/skill-tutor-tutorials-backup-…`).
 - Move, never destroy. This section has no command that destroys files, and you must not run one. If any step fails, stop and report the error. Never retry with force.
 - When in doubt, keep.
@@ -33,12 +33,14 @@ Run this as **one** Bash tool call (on native Windows without Git Bash, run the 
 repo=$(cd -P "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" && pwd -P)
 inside_repo() {
   d=$(cd -P "$(dirname "$1")" 2>/dev/null && pwd -P) || return 1
-  case "$d/$(basename "$1")" in "$repo"/*) return 0 ;; esac
+  r="$d/$(basename "$1")"
+  case "$r/" in "$repo"/*) return 0 ;; esac
+  case "$repo/" in "$r"/*) return 0 ;; esac
   return 1
 }
 for p in "$HOME/skill-tutor-tutorials" "$HOME/.claude/commands/learn.md" "$HOME/.claude/commands/learn"; do
   if [ -e "$p" ] || [ -L "$p" ]; then
-    if inside_repo "$p"; then echo "SKIP $p (its real location is inside this repo)"; continue; fi
+    if inside_repo "$p"; then echo "SKIP $p (it is inside this repo, or the repo is inside it)"; continue; fi
     echo "FOUND $p"
     echo "  entries: $(find "$p" | wc -l | tr -d ' ')"
     echo "  newest:  $(find "$p" -exec ls -ldt {} + | head -n 1)"
@@ -58,16 +60,23 @@ function Get-Entries([string]$Path) {
   }
 }
 function Test-InRepo([string]$Path) {
-  $repo = git rev-parse --show-toplevel 2>$null
+  $sep = [System.IO.Path]::DirectorySeparatorChar
+  $ic = [System.StringComparison]::OrdinalIgnoreCase
+  $repo = $null
+  if (Get-Command git -ErrorAction SilentlyContinue) {
+    try { $repo = & git rev-parse --show-toplevel 2>$null | Select-Object -First 1 } catch { $repo = $null }
+  }
   if (-not $repo) { $repo = (Get-Location).Path }
-  $repo = (Resolve-Path -LiteralPath $repo).ProviderPath
+  $repo = (Resolve-Path -LiteralPath $repo).ProviderPath.TrimEnd('\', '/') + $sep
+  $full = [System.IO.Path]::GetFullPath($Path).TrimEnd('\', '/') + $sep
+  if ($full.StartsWith($repo, $ic) -or $repo.StartsWith($full, $ic)) { return $true }
   $d = Split-Path -Parent $Path
   while ($d -and ($d -ne $HOME) -and (Test-Path -LiteralPath $d)) {
     $it = Get-Item -LiteralPath $d -Force
     if ($it.LinkType) {
       $t = @($it.Target)[0]
       if (-not [System.IO.Path]::IsPathRooted($t)) { $t = Join-Path (Split-Path -Parent $d) $t }
-      if ([System.IO.Path]::GetFullPath($t).StartsWith($repo, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+      if (([System.IO.Path]::GetFullPath($t).TrimEnd('\', '/') + $sep).StartsWith($repo, $ic)) { return $true }
     }
     $d = Split-Path -Parent $d
   }
@@ -75,7 +84,7 @@ function Test-InRepo([string]$Path) {
 }
 foreach ($p in @((Join-Path $HOME 'skill-tutor-tutorials'), (Join-Path $HOME '.claude\commands\learn.md'), (Join-Path $HOME '.claude\commands\learn'))) {
   if (Get-Item -LiteralPath $p -Force -ErrorAction SilentlyContinue) {
-    if (Test-InRepo $p) { "SKIP $p (its real location is inside this repo)"; continue }
+    if (Test-InRepo $p) { "SKIP $p (it is inside this repo, or the repo is inside it)"; continue }
     $entries = @(Get-Entries $p)
     "FOUND $p"
     "  entries: $($entries.Count)"
@@ -87,7 +96,7 @@ foreach ($p in @((Join-Path $HOME 'skill-tutor-tutorials'), (Join-Path $HOME '.c
 
 - `find` without `-L` never follows a symlink: a symlink counts as **one** entry, and its target is printed next to it. The bash block uses only commands that behave the same on GNU (Linux, WSL) and BSD (macOS). The PowerShell block uses `Get-Item -Force`, which also finds a dangling symlink.
 - The entry count is always exact. For a very large folder, `find … -exec ls -ldt {} +` can split into batches, so the "newest" line is then only approximate.
-- A `SKIP` line is not a leftover: its real location is inside this repo, so ignore it everywhere below. Count only the `FOUND` paths.
+- A `SKIP` line is not a leftover: the path is inside this repo, or this repo is inside it, so ignore it everywhere below. Count only the `FOUND` paths.
 - **If nothing is found** (no `FOUND` line): say, in Hebrew, "לא נמצאו שאריות מהתקנה קודמת." and continue to section 0.1.
 - **Otherwise:** show each path found with its entry count, its newest modification date and any symlink targets, and remember the counts for Step 4.
 
@@ -119,12 +128,14 @@ dest="$HOME/skill-tutor-tutorials-backup-$ts"
 repo=$(cd -P "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" && pwd -P)
 inside_repo() {
   d=$(cd -P "$(dirname "$1")" 2>/dev/null && pwd -P) || return 1
-  case "$d/$(basename "$1")" in "$repo"/*) return 0 ;; esac
+  r="$d/$(basename "$1")"
+  case "$r/" in "$repo"/*) return 0 ;; esac
+  case "$repo/" in "$r"/*) return 0 ;; esac
   return 1
 }
 move_aside() {
   if [ -e "$1" ] || [ -L "$1" ]; then
-    if inside_repo "$1"; then echo "SKIP $1 (its real location is inside this repo)"; return 0; fi
+    if inside_repo "$1"; then echo "SKIP $1 (it is inside this repo, or the repo is inside it)"; return 0; fi
     mv "$1" "$2" || exit 1
   fi
 }
@@ -152,16 +163,23 @@ function Get-Entries([string]$Path) {
   }
 }
 function Test-InRepo([string]$Path) {
-  $repo = git rev-parse --show-toplevel 2>$null
+  $sep = [System.IO.Path]::DirectorySeparatorChar
+  $ic = [System.StringComparison]::OrdinalIgnoreCase
+  $repo = $null
+  if (Get-Command git -ErrorAction SilentlyContinue) {
+    try { $repo = & git rev-parse --show-toplevel 2>$null | Select-Object -First 1 } catch { $repo = $null }
+  }
   if (-not $repo) { $repo = (Get-Location).Path }
-  $repo = (Resolve-Path -LiteralPath $repo).ProviderPath
+  $repo = (Resolve-Path -LiteralPath $repo).ProviderPath.TrimEnd('\', '/') + $sep
+  $full = [System.IO.Path]::GetFullPath($Path).TrimEnd('\', '/') + $sep
+  if ($full.StartsWith($repo, $ic) -or $repo.StartsWith($full, $ic)) { return $true }
   $d = Split-Path -Parent $Path
   while ($d -and ($d -ne $HOME) -and (Test-Path -LiteralPath $d)) {
     $it = Get-Item -LiteralPath $d -Force
     if ($it.LinkType) {
       $t = @($it.Target)[0]
       if (-not [System.IO.Path]::IsPathRooted($t)) { $t = Join-Path (Split-Path -Parent $d) $t }
-      if ([System.IO.Path]::GetFullPath($t).StartsWith($repo, [System.StringComparison]::OrdinalIgnoreCase)) { return $true }
+      if (([System.IO.Path]::GetFullPath($t).TrimEnd('\', '/') + $sep).StartsWith($repo, $ic)) { return $true }
     }
     $d = Split-Path -Parent $d
   }
@@ -178,7 +196,7 @@ $moves = @(
 )
 foreach ($m in $moves) {
   if (Get-Item -LiteralPath $m[0] -Force -ErrorAction SilentlyContinue) {
-    if (Test-InRepo $m[0]) { "SKIP $($m[0]) (its real location is inside this repo)"; continue }
+    if (Test-InRepo $m[0]) { "SKIP $($m[0]) (it is inside this repo, or the repo is inside it)"; continue }
     Move-Item -LiteralPath $m[0] -Destination $m[1] -ErrorAction Stop
   }
 }
