@@ -149,6 +149,23 @@ Check the output: no `STILL PRESENT` line, and each `IN BACKUP` entry count equa
 
 ---
 
+## 0.1 Claude Code version
+
+*Runs on every `/learn setup`, including a first run with no settings file.*
+
+**Floor:** 2.1.176
+
+1. Run `claude --version`. If `claude` is not found (e.g. a Desktop-bundled install with no `claude` on PATH), skip this section silently and continue to section A.
+2. Take the first `major.minor.patch` version in the output (e.g. `2.1.284 (Claude Code)` gives `2.1.284`).
+3. Compare it with the floor **numerically, one component at a time**: major first, then minor, then patch. Never compare the two strings as text: `2.1.99` is lower than `2.1.100`, although it sorts higher as text.
+4. If it is lower than the floor, show this warning in Hebrew, filling in both versions, then continue to section A:
+   > "גרסת Claude Code שלך (<installed>) ישנה מהגרסה המינימלית שהקורס צריך (<floor>). כדי לעדכן, הריצו בטרמינל: `claude update`"
+5. Otherwise continue to section A without a message.
+
+*Limitation:* `claude --version` reports whichever `claude` comes first on PATH, which may not be the binary running this session.
+
+---
+
 ## A. Show Current Settings
 
 If `~/skill-tutor-tutorials/settings.json` exists, display a friendly summary table showing: session language, course path, TTS enabled/disabled, voice name, TTS language, speed, and mode.
