@@ -485,7 +485,12 @@ def test_worktree_git_file(good_tree: Path, tmp_path_factory) -> None:
     git = git_repo(main)
     git(["git", "init", "-q"])
     git(["git", "add", "-A"])
-    ident = ["-c", "user.name=t", "-c", "user.email=t@example.com"]
+    ident = [
+        "-c", "user.name=t",
+        "-c", "user.email=t@example.com",
+        "-c", "commit.gpgsign=false",
+        "-c", "core.hooksPath=/dev/null",
+    ]
     git(["git", *ident, "commit", "-q", "-m", "init"])
     git(["git", "worktree", "add", "-q", str(base / "wt")])
     wt = base / "wt"
