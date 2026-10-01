@@ -350,7 +350,7 @@ All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n--
 - **Behaviour:**
   - Run `claude --version` and take the first `X.Y.Z`.
   - Compare it with 2.1.176 **numerically, component by component (major, then minor, then patch), never as text** (RV2-L2).
-  - If it's lower, show a short Hebrew warning and the update command (`claude update`), then continue.
+  - If it's lower, show a short Hebrew warning that names **both** versions (installed and floor) and gives the update command (`claude update`), as its own message and word for word, then continue. Manual check 2b found the tutor paraphrasing it and dropping the floor.
   - If `claude` isn't on PATH (e.g. Desktop-bundled installs, the PRD D9a route), skip silently.
   - **Limitation (RV3-L4):** `claude --version` reports whichever `claude` is on PATH, which may not be the running binary; no version variable is exposed (§3). The PR notes both limitations.
 

@@ -232,8 +232,8 @@ Check the output: no `STILL PRESENT` line (a `SKIP` path is not one), and each `
 1. Run `claude --version`. If `claude` is not found (e.g. a Desktop-bundled install with no `claude` on PATH), skip this section silently and continue to section A.
 2. Take the first `major.minor.patch` version in the output (e.g. `2.1.284 (Claude Code)` gives `2.1.284`).
 3. Compare it with the floor **numerically, one component at a time**: major first, then minor, then patch. Never compare the two strings as text: `2.1.99` is lower than `2.1.100`, although it sorts higher as text.
-4. If it is lower than the floor, show this warning in Hebrew, filling in both versions, then continue to section A:
-   > "גרסת Claude Code שלך (<installed>) ישנה מהגרסה המינימלית שהקורס צריך (<floor>). כדי לעדכן, הריצו בטרמינל: `claude update`"
+4. If it is lower than the floor, show the warning below **as its own message, word for word**. Replace `INSTALLED` with the version from step 2 and `FLOOR` with the **Floor** value at the top of this section. **Both numbers must appear.** Do not shorten or paraphrase the sentence, and do not merge it with any other message (such as the result of the clean-slate step). Then continue to section A:
+   > "גרסת Claude Code שלך (INSTALLED) ישנה מהגרסה המינימלית שהקורס צריך (FLOOR). כדי לעדכן, הריצו בטרמינל: `claude update`"
 5. Otherwise continue to section A without a message.
 
 *Limitation:* `claude --version` reports whichever `claude` comes first on PATH, which may not be the binary running this session.
