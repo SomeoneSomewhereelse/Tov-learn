@@ -3298,21 +3298,24 @@ Then run check 0 one last time. Its `PRESENT` lines must match exactly what chec
 - [ ] **Step 2: Push and open it as a draft.**
 
 ```bash
+REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)   # the repo `origin` points at (here: the maintainer's fork)
+echo "REPO=$REPO"
 git push -u origin fix/stage0-quick-wins
-gh pr create --draft --base master --head fix/stage0-quick-wins --title "Stage 0: quick-win PR (content fixes, first CI lints, node24 CI)" --body-file "$SCRATCH/pr-body.md"
+gh pr create --repo "$REPO" --draft --base master --head fix/stage0-quick-wins --title "Stage 0: quick-win PR (content fixes, first CI lints, node24 CI)" --body-file "$SCRATCH/pr-body.md"
 ```
-Write `$SCRATCH/pr-body.md` first, with the sections in Step 4.
+`--repo` is explicit so that `gh` never opens the PR against a fork's upstream parent by mistake. Write the PR body file first (here `pr-body.md` in the plan's `.superpowers` workspace), with the sections in Step 4. `validate.yml` runs only for pull requests to `master` and pushes to `master`, so the draft PR is what starts the CI run.
 
 - [ ] **Step 3: CI evidence (RV4-M3).**
 
 ```bash
-run_id=$(gh run list --branch fix/stage0-quick-wins --workflow validate.yml --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId')
+REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
+run_id=$(gh run list -R "$REPO" --branch fix/stage0-quick-wins --workflow validate.yml --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId')
 echo "run_id=${run_id:-none yet}"
-gh run watch "$run_id" --exit-status
-job_id=$(gh run view "$run_id" --json jobs --jq '.jobs[0].databaseId')
-gh api "repos/TovTechOrg/Tov-learn/check-runs/$job_id/annotations"
+gh run watch -R "$REPO" "$run_id" --exit-status
+job_id=$(gh run view -R "$REPO" "$run_id" --json jobs --jq '.jobs[0].databaseId')
+gh api "repos/$REPO/check-runs/$job_id/annotations"
 ```
-The run may not be queued yet right after `gh pr create`. If `run_id` is empty, don't call `gh run watch ""`. Wait with the Monitor tool (foreground `sleep` is blocked in Claude Code) on `until [ -n "$(gh run list --branch fix/stage0-quick-wins --workflow validate.yml --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId')" ]; do sleep 10; done`, then rerun the block.
+The run may not be queued yet right after `gh pr create`. If `run_id` is empty, don't call `gh run watch ""`. Wait with the Monitor tool (foreground `sleep` is blocked in Claude Code) on `until [ -n "$(gh run list -R "$REPO" --branch fix/stage0-quick-wins --workflow validate.yml --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId')" ]; do sleep 10; done`, then rerun the block.
 
 **Pass condition:** the run succeeds, and **no annotation mentions `Node.js 20` or `node20`**. The notice "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026" is expected and doesn't fail the check (`runs-on: ubuntu-latest` is kept by user decision). Paste the annotations output into the PR.
 
