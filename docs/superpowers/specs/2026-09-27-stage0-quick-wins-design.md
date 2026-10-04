@@ -1,6 +1,6 @@
 # Stage 0 — Quick-Win PR: Design Spec
 
-**Date:** 2026-09-27 · **Revision:** 6.2 (2026-10-01), after five independent reviews, the plan review and the final branch review (§10) · **Status:** **locked** by the user (2026-09-29); rev 6.1 is editorial only (no decision changed). Rev 6.2 records the fixes from the final branch review (§10); it changes S5's guard, two lint rules and four content items. Plan: `docs/superpowers/plans/2026-09-29-stage0-quick-wins.md`
+**Date:** 2026-09-27 · **Revision:** 6.3 (2026-10-04), after five independent reviews, the plan review, the final branch review and a Hebrew style decision (§4.2 "Voice", §10) · **Status:** **locked** by the user (2026-09-29); rev 6.1 is editorial only (no decision changed). Rev 6.2 records the fixes from the final branch review (§10); it changes S5's guard, two lint rules and four content items. Plan: `docs/superpowers/plans/2026-09-29-stage0-quick-wins.md`
 **Parent:** `docs/prds/project-redesign-2026-09-25.md` (the PRD). References such as "D2 item 5", "§3" and "R14" point there. "Review §2.x" points to `docs/reviews/project-review-2026-09-24.md`. "RV-…" through "RV5-…" point to the spec reviews (§10).
 **Baseline:** `master` at `290af75` (= `origin/master`, after #12 and #13 were merged on 2026-09-28). Its tree is identical to the earlier local `d04ca2a` (tree `5bf8edb`), so every line number below refers to that tree.
 **Scope:** Stage 0 only:
@@ -152,6 +152,8 @@ All 19 `[SLIDE TRANSITION]` → `[מעבר שקף]`. No other *marker* change. I
   - script title lines in 0.2, 0.3 and 0.4, including "Lesson 0.3" in both places in the opening
 - **Spoken lesson numbers.** The full inventory, built with the S17 parser: every digit-table form (including שישה/שבעה/ארבעה…) and one-letter prefixes (RV3-H1, H2). Each is rewritten to the real lesson:
 
+  The "Becomes" spelled forms below were first applied as spelled numbers (rev 6.1/6.2). Under the Voice rules (rev 6.3) they are written as numerals, e.g. "אחת נקודה X" is "1.X" and "שתיים נקודה X" is "2.X"; the lesson each reference names is unchanged.
+
   | File:line | Now | Becomes |
   |---|---|---|
   | `1.1:1`, `1.2:1`, `1.3:1`, `1.4:1` (self), `1.5:1`, `1.6:1`, `1.8:2` | "שלוש נקודה X" (self) | "אחת נקודה X" |
@@ -193,7 +195,12 @@ All 19 `[SLIDE TRANSITION]` → `[מעבר שקף]`. No other *marker* change. I
   - `2.1_script.txt:5`: → a bridge from Module 01.
   - `2.6_script.txt:77`: cut the "module 6 / lesson 6.1" teaser. The closing summary stays. There's no bridge to the final project, because Stage 0 disables it (RV2-L12).
 - **Leaked preambles (G1).** In `1.8`, `2.3` and `2.6_exercises.md`, delete line 1 and the blank/`---` lines that follow it, up to `<div dir="rtl" lang="he">`.
-- **Voice:** replacement Hebrew matches the file. It's reviewed by a Hebrew-speaking contributor.
+- **Voice:** replacement Hebrew matches the file. It's reviewed by a Hebrew-speaking contributor. **Hebrew style rules (user decision, 2026-10-04), which the replacement Hebrew follows. Readers are assumed to read English, so not everything is translated verbatim:**
+  1. **Numbers are numerals.** Lesson, module and version numbers and exit codes are written as digits, not spelled out: "1.3", "מודול 2", "2.1.176", "exit code 2" (not "אחת נקודה שלוש", "מודול שתיים", "שתיים נקודה אחת נקודה מאה שבעים ושש", "קוד יציאה שתיים"). A Hebrew prefix letter is hyphenated: "ב-1.3", "ו-1.5", "ל-production". Counts and ordinals that aren't labels stay words ("ארבעה מודולים", "השיעור השביעי", "רמות שלוש וארבע").
+  2. **Technical terms stay in English:** file names and paths (`secret-demo.txt`, `.claude/settings.json`), tool and event names (`PreToolUse`, `Read`), and technical and product terms (hook, exit code, stderr, linter, Claude Code, Supabase, MCP, production, deploy, git push, code review). Not "פרי טול יוז", "נוטס נקודה טי אקס טי" or "קוד ריוויו". Everyday loanwords (פרויקט, אפליקציה, לפטופ) stay Hebrew.
+  3. **Don't translate verbatim.** Prefer the term the reader will see on screen.
+  **Scope: the whole course, where applicable.** Stage 0 applies the rules to the 42 script lines it changes (of the 54 Hebrew script lines in this PR) and to nothing else, because edits stay minimal and every rewrite stays with its Stage 1 slice. Every other script, exercise and tutor file follows with the unit that owns it (§9: F's style guide, 1a, 1b, 1c, 1d, 1e). "Where applicable" excludes counts and ordinals (rule 1) and quoted learner-facing text that has to match what a tool prints. **Consequences for the lints:** `spoken_lesson_refs` only parses spelled numbers, so a converted reference is no longer checked until N's manifest replaces the lint. And each unit that converts a phrase listed in `SPOKEN_ALLOWLIST` (OAuth 2.0, Opus 4.6, Python 3.13/3.14 and so on) must delete that entry in the same commit, or the stale-entry rule reports it.
+  **Open check:** the TTS voice (S2b) must be listened to on a converted lesson (1.3 is the densest). Numerals such as "2.1.176" and Latin-script terms may be pronounced differently from the spelled forms.
 - **Known churn:** 1b renumbers 0.x again. `0.1_script.txt:125` ("next lesson: a practical tour of Claude Code, Cursor, Copilot") doesn't describe today's 0.2. It's left for 1b's reorder, which is expected to make it true again (RV3-L10).
 
 #### Item 10: the 1.3 hook exercise
@@ -235,7 +242,7 @@ All 19 `[SLIDE TRANSITION]` → `[מעבר שקף]`. No other *marker* change. I
 
 **Related edits:**
 - `1.3_exercises.md:8`: "v2.1.59+" → "v2.1.176+".
-- `1.3_script.txt:15`: the sentence becomes a **lesson-wide** requirement ("לשיעור הזה צריך קלוד קוד בגרסה שתיים נקודה אחת נקודה מאה שבעים ושש ומעלה"), not an auto-memory one. The facts at `:3` and `:11` about when auto memory arrived stay (S14, RV3-L5).
+- `1.3_script.txt:15`: the sentence becomes a **lesson-wide** requirement ("לשיעור הזה צריך Claude Code בגרסה 2.1.176 ומעלה", in the style of the Voice rules), not an auto-memory one. The facts at `:3` and `:11` about when auto memory arrived stay (S14, RV3-L5).
 - `1.3_script.txt:25`: soften "חוסם פעולה באופן מוחלט" to "deterministic for the tool call it matches".
 - `1.3_script.txt:27`: the exit-2 vs exit-1 correction.
 - `1.3_script.txt:29`: the read-guard demo. No deletion, and no Python-bypass suggestion.
@@ -647,7 +654,7 @@ Manual checks 4–6, the VAT grep and `spoken_lesson_refs` cover changes that §
 | Unit | Concern carried forward |
 |---|---|
 | M | Drop `auto-save-progress.ps1` and the slide viewer; the CLAUDE.md module table and its lint. **Before `tutor_refs` can serve as M's done-when (PRD D8d), M must extend it to resolve `${CLAUDE_SKILL_DIR}/…` against the folder of the nearest `SKILL.md`, with seeded tests (RV2-M4).** Otherwise the lint passes vacuously |
-| F | `landscape.md` (including the Claude Code floor and the Node row); baseline/model-string/full denylist; the rest of CONTRIBUTING; the style guide; `changes.md` → Keep-a-Changelog; `quiz.md:14` Hebrew triggers; `jsonschema` in the dev group if needed |
+| F | `landscape.md` (including the Claude Code floor and the Node row); baseline/model-string/full denylist; the rest of CONTRIBUTING; the style guide (**including the Hebrew style rules of §4.2 "Voice", for the whole course**); `changes.md` → Keep-a-Changelog; `quiz.md:14` Hebrew triggers; `jsonschema` in the dev group if needed |
 | **N (proposed)** | Numbering contract:<br>• stable lesson ids as the contract; numbers derived<br>• a manifest<br>• a deterministic generator (COURSE.md tables, exercise and script headers, inside `<!-- generated -->` markers)<br>• CI `--check`<br>• id references in prose<br>• a thin `renumber`/`add-lesson` skill<br>• a CLAUDE.md rule to run the generator before any push (convenience; CI enforces)<br>Replaces `header_numbers` and `spoken_lesson_refs` |
 | G | Interpreter resolution; owned `settings.local.json` entries; the no-`python3` lint; branch protection. **Constraints: learner tooling must not require uv; no `.python-version` at the repo root** |
 | 1a | The full 1.3 lab; macOS/Windows OS-lock equivalents (UNVERIFIED); 1.2 fixes; 1.1 homework |
@@ -655,6 +662,7 @@ Manual checks 4–6, the VAT grep and `spoken_lesson_refs` cover changes that §
 | 1c | Module 02 rename. `2.5_script.txt:97` expands MCP as "Multi-Claude-Pipeline" (RV3-L12). **If 2.0 teaches uv, learner projects live outside the repo folder** (uv project discovery would otherwise attach to `tov-learn`) |
 | 1d | `@supabase/ssr`/auth rewrite; Prisma removal; an end-to-end check of the MCP flow |
 | 1e | Restore `/learn project` and the resume offer; delete the TEMPORARY blocks; `projects.md:7` |
+| 1a–1e | Each slice applies the §4.2 Hebrew style rules to every script, exercise and tutor line it touches, where applicable, and removes the matching `SPOKEN_ALLOWLIST` entries it converts |
 | Gate | Remove the README tester note, the CLEAN-SLATE section, `clean_slate_no_delete` and the `test_clean_slate_*` behavioural tests (they read the section out of `setup.md` and would fail with an IndexError) |
 | S2a | Whether `learn.md` stays model-invocable; 3-OS pytest CI (already on uv); learner CLI without uv; Dependabot `uv` once 0.12 support is confirmed |
 
@@ -818,6 +826,9 @@ A third review (same setup) raised no High or Medium findings, 10 Low and 2 nits
 | TR-L9 | Two silent fallbacks (`inside_repo` on a failed `cd`, `repo_files` on a git error) | **Not changed**: they match the spec as written |
 | TR-L10 | The 1.6 dummy row had no `accountant_id`, so the RLS policy hid it | The step now says to set it (the rest is 1d's) |
 | nits | `"בוחן"` listed before `"בוחן מלא"`; an empty backup folder if everything is skipped | **Not changed**: same ambiguity as the existing `quiz me` rows; harmless |
+
+### Hebrew style rules (2026-10-04, rev 6.3)
+The maintainer asked for three rules for the Hebrew replacement text (§4.2 "Voice") and for them to apply to the whole course where applicable. Stage 0 applies them to the script lines it changed (commit "numerals for lesson, module and version numbers; English for technical terms"); the rest follows with the owning units (§9). Side effects: "מודול אחת" is now "מודול 1", which removes the masculine-noun / feminine-number question that was deferred to the Hebrew reviewer (FR-L8), and the `1.3` hook narration no longer spells out file and event names.
 
 ### Plan review (2026-09-29, rev 6.1)
 A fresh single-agent review of the implementation plan also reported four editorial inconsistencies in this spec. All were fixed in place, and no decision changed. Its plan findings were fixed in the plan.
