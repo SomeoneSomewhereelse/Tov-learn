@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Status Module
 
 *Loaded when $ARGUMENTS = "status". Generates an HTML progress dashboard.*

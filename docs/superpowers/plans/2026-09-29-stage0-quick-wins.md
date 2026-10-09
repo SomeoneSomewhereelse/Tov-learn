@@ -8,9 +8,43 @@
 
 **Tech Stack:** uv 0.12.19 (CI pin; local ≥ 0.12), Python 3.14, pytest ≥ 9.1.1, ruff ≥ 0.16.9, GitHub Actions (`actions/checkout` v7.0.1, `astral-sh/setup-uv` v10.2.0, SHA-pinned), Claude Code slash-command markdown (the tutor), Hebrew course content.
 
-**Spec:** `docs/superpowers/specs/2026-09-27-stage0-quick-wins-design.md` (revision 6.1, locked 2026-09-29; rev 6.1 is editorial only). Parent PRD: `docs/prds/project-redesign-2026-09-25.md`, whose §8 amendments A1–A13 win over the text above them. Read the spec before starting. This plan argues from it and does not repeat its reasons.
+**Spec:** `docs/superpowers/specs/2026-09-27-stage0-quick-wins-design.md` (revision 6.5; locked 2026-09-29, with rev 6.1 editorial, rev 6.2 recording the final-review fixes, rev 6.3 the Hebrew style rules rev 6.4 their extension to every touched script and exercise and rev 6.5 the maintainer decisions on the remaining cases). Parent PRD: `docs/prds/project-redesign-2026-09-25.md`, whose §8 amendments A1–A13 win over the text above them. Read the spec before starting. This plan argues from it and does not repeat its reasons.
 
 **How this plan was checked (2026-09-29):** the validator and the tests below were run with uv 0.12.19, pytest 9.1.1 and ruff 0.16.9 against a clone of the docs branch. Every edit block in Tasks 2–22 was then applied in order to a second clone, and the real-repo finding count after each task matched the **Expected** line of that task. The fixed tree ended with 0 findings, `ruff check` clean, and 58 tests passing. This plan file itself passes `relative_links`. A fresh single-agent review of this plan (2026-09-29) found no High issues. Its 2 Medium and 6 Low findings are fixed here: sentinel-guarded cleanup and a settings hash at every manual check, the Task 1 Step 5 expectation, abort recovery, commit authorization in Task 0, the CI-run race, and PowerShell dangling links. Its 4 spec findings are fixed in spec rev 6.1 (§10, PR-S1–S4). The dry run above was repeated after the fixes.
+
+## Post-implementation amendments (rev 6.2, 2026-10-01)
+
+The plan was executed inline, then a fresh Opus 5.5 reviewer read the whole branch (Task 23 Step 4). The user approved fixing the findings, as separate commits after the 22 plan commits. The branch was reviewed twice: the first review's findings are the rows below up to L10, a second review of the fixed branch added rows SR-M1 to SR-L6, and a third added rows TR-L1 to TR-L10. The task text below is otherwise unchanged and describes the original run. Where it disagrees with this section, this section wins:
+
+| Finding | Fix | Where |
+|---|---|---|
+| M1 | `0.4_script.txt` still promised "Module One: Business Automations" with Make.com, and a "Module Five". Both now name the real modules (01 Claude Code, 02 Claude API). It is a spec gap (§4.2 listed only 0.4's title, "Lesson 0.3" and course line) | content commit |
+| M2 | Clean-slate (Task 14) moved the repo's own tutor files when `~/.claude/commands` is a symlink into the repo. Steps 1 and 3 (bash and PowerShell) now resolve the real parent folder and print `SKIP` for any path inside the repo. Three behavioural tests run the real bash blocks against a fake HOME | `setup.md`, tests |
+| L1 | `changes.md` #13 "Before" said the instructions converted the wrong way. They gave no direction | `changes.md` |
+| L2 | CLAUDE.md and CONTRIBUTING tell contributors to `git add` new files before running the tests | docs |
+| L3 | `test_worktree_git_file` pins `commit.gpgsign=false` and `core.hooksPath=/dev/null` | tests |
+| L4 | `check_relative_links` treats `/x.md` as relative to the repo root; `repo_files` falls back to walking when `git` isn't installed | validator, tests |
+| L5 | Commit `3ddce85` says "groups C, T and D". The template in Task 1 Step 10 now says "C and T". The commit's message isn't rewritten (a rebase would change 30+ hashes for a cosmetic fix) | plan text |
+| L6, L7 | CLAUDE.md names the right test file; the three "add a module" docs say the flag stops the model invoking the module as a command, not that Claude never loads it | docs |
+| L8 | `1.1_script.txt:1` "אחת נקודה אחד" becomes "אחת נקודה אחת". The masculine "מודול אחת" (five places) is left for the Hebrew reviewer | content |
+| L9 | The clean-slate prompt says the data may include the tester's live progress | `setup.md` |
+| L10 | 1.6 mentions the first-use approval of a project-scoped MCP server | content |
+| SR-M1 | The clean-slate guard only asked whether a path is inside the repo, so a clone placed in `~/skill-tutor-tutorials/` was moved with that folder. It now also skips a path that contains the repo (bash and PowerShell) | `setup.md`, tests |
+| SR-M2 | `0.2_script.txt` promised Make, n8n and ManyChat. The tools slide now describes Module 02, in the wording of the module overview. `2.5_script.txt:2` ("במודול האינטגרציות") stays for unit 1c | content |
+| SR-L1, L2 | The commit count and the "revision 6.1" citation in this file were wrong | this section, the header |
+| SR-L3, L4 | PowerShell `Test-InRepo`: no longer fails without `git` (Get-Command and try/catch), and its prefix test ends in a path separator | `setup.md` |
+| SR-L6 | `repo_files` also walks when `git ls-files` itself fails (corrupt `.git`, dubious ownership) | validator, tests |
+| TR-L1 | The bash clean-slate blocks have never run under Git Bash on Windows (path forms, junctions, case). Added to the spec's untested list | spec §6.2 |
+| TR-L2 | The gate removes the `test_clean_slate_*` tests too | spec §9 |
+| TR-L3, L4, L5 | `changes.md` entries 6, 7, 9 and 13 corrected or extended | `changes.md` |
+| TR-L8 | Every git call in the git-tree tests ignores the global and system git config | tests |
+| TR-L10 | The 1.6 dummy row says to set `accountant_id` | content |
+| TR-L6 | Spec header: four content items | spec |
+| SR-L5, L7 | Not fixed, by decision. L5: the guard uses `--show-toplevel`, as the spec says, so a linked worktree's main checkout isn't covered (contributors only). L7: three validator gaps (a module row with no backticked folder, a lesson folder without the `X.Y-` prefix, `<…>` link targets with spaces) don't affect the tree | none |
+| Hebrew style (rev 6.3) | Numerals for lesson, module and version numbers and exit codes; technical terms, file names and tool names in English; applied to every script and exercise file this branch touches (the 42 changed script lines first, then in full: rev 6.4), and to the rest of the course later, with the owning units (spec §4.2 "Voice", §9). The Hebrew in the task blocks below is the first-run text: where it spells numbers or transliterates terms, the branch has the restyled version | content |
+| TR-L7, L9, nits | Not fixed, by decision: `relative_links` skips the outer target of an image link; two silent fallbacks match the spec as written; the `"בוחן"` / `"בוחן מלא"` order and an empty backup folder are harmless | none |
+
+**What changes in the numbers.** The code blocks in Tasks 1 and 14 are the first-run versions. The finished branch has 67 tests, not 58: three clean-slate behavioural tests, `root-absolute-link`, `root-absolute-missing` and the missing-git fallback (first review), then two more clean-slate cases (a folder that contains the repo, for Step 1 and Step 3) and the broken-git fallback (second review). The third review added no tests. Every "58" below is the original run's count; the final evidence is `67 passed`, ruff silent, `0 finding(s)`. The branch is the 22 plan commits plus the review-fix commits; `git log --oneline master..HEAD` is the count. Manual check 3 is unchanged: `test_clean_slate_move_leaves_the_repo_alone` covers the symlink case without touching the user's `$HOME`.
 
 ## Global Constraints
 
@@ -1278,7 +1312,7 @@ uv run python "$SCRATCH/findings.py" > "$SCRATCH/p1-findings.txt"
   echo "actions (checkout v7.0.1, setup-uv v10.2.0) with contents: read; Dependabot"
   echo "tracks github-actions weekly."
   echo
-  echo "test_real_repo_passes is red until groups C, T and D land. Red findings:"
+  echo "test_real_repo_passes is red until groups C and T land. Red findings:"
   echo
   cat "$SCRATCH/p1-findings.txt"
   echo
@@ -3265,21 +3299,24 @@ Then run check 0 one last time. Its `PRESENT` lines must match exactly what chec
 - [ ] **Step 2: Push and open it as a draft.**
 
 ```bash
+REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)   # the repo `origin` points at (here: the maintainer's fork)
+echo "REPO=$REPO"
 git push -u origin fix/stage0-quick-wins
-gh pr create --draft --base master --head fix/stage0-quick-wins --title "Stage 0: quick-win PR (content fixes, first CI lints, node24 CI)" --body-file "$SCRATCH/pr-body.md"
+gh pr create --repo "$REPO" --draft --base master --head fix/stage0-quick-wins --title "Stage 0: quick-win PR (content fixes, first CI lints, node24 CI)" --body-file "$SCRATCH/pr-body.md"
 ```
-Write `$SCRATCH/pr-body.md` first, with the sections in Step 4.
+`--repo` is explicit so that `gh` never opens the PR against a fork's upstream parent by mistake. Write the PR body file first (here `pr-body.md` in the plan's `.superpowers` workspace), with the sections in Step 4. `validate.yml` runs only for pull requests to `master` and pushes to `master`, so the draft PR is what starts the CI run.
 
 - [ ] **Step 3: CI evidence (RV4-M3).**
 
 ```bash
-run_id=$(gh run list --branch fix/stage0-quick-wins --workflow validate.yml --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId')
+REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
+run_id=$(gh run list -R "$REPO" --branch fix/stage0-quick-wins --workflow validate.yml --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId')
 echo "run_id=${run_id:-none yet}"
-gh run watch "$run_id" --exit-status
-job_id=$(gh run view "$run_id" --json jobs --jq '.jobs[0].databaseId')
-gh api "repos/TovTechOrg/Tov-learn/check-runs/$job_id/annotations"
+gh run watch -R "$REPO" "$run_id" --exit-status
+job_id=$(gh run view -R "$REPO" "$run_id" --json jobs --jq '.jobs[0].databaseId')
+gh api "repos/$REPO/check-runs/$job_id/annotations"
 ```
-The run may not be queued yet right after `gh pr create`. If `run_id` is empty, don't call `gh run watch ""`. Wait with the Monitor tool (foreground `sleep` is blocked in Claude Code) on `until [ -n "$(gh run list --branch fix/stage0-quick-wins --workflow validate.yml --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId')" ]; do sleep 10; done`, then rerun the block.
+The run may not be queued yet right after `gh pr create`. If `run_id` is empty, don't call `gh run watch ""`. Wait with the Monitor tool (foreground `sleep` is blocked in Claude Code) on `until [ -n "$(gh run list -R "$REPO" --branch fix/stage0-quick-wins --workflow validate.yml --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId')" ]; do sleep 10; done`, then rerun the block.
 
 **Pass condition:** the run succeeds, and **no annotation mentions `Node.js 20` or `node20`**. The notice "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026" is expected and doesn't fail the check (`runs-on: ubuntu-latest` is kept by user decision). Paste the annotations output into the PR.
 

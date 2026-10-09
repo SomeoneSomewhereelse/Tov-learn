@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # CLI-First Reference
 
 *Shared principle. Any module may reference this as "follow cli-first".*

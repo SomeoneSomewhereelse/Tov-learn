@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Project Analysis Module
 
 *Loaded when the learner chooses "project analysis".*

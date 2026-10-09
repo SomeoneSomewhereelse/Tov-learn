@@ -1,8 +1,242 @@
+---
+disable-model-invocation: true
+---
 # Setup Module
 
 *Loaded by learn.md when settings.json is missing or $ARGUMENTS = "setup".*
 
 Respond in the language the user answers with in section B. Default to Hebrew if unclear.
+
+---
+
+<!-- CLEAN-SLATE:BEGIN — TEMPORARY, remove at first-cohort gate (PRD D10) -->
+## 0. Clean slate
+
+*TEMPORARY, for the tester period only. Runs on every `/learn setup`, before section 0.1.*
+
+Leftovers from an earlier install fail quietly: a personal `~/.claude/commands/learn.md` shadows this repo's `/learn` and keeps running old code, and an old `settings.json` is half-read. This step finds them and offers to move them into a backup folder.
+
+**Hard rules for this section:**
+- Look at exactly three paths, and nothing else: `~/skill-tutor-tutorials/`, `~/.claude/commands/learn.md` and `~/.claude/commands/learn/`. No globs, no other names.
+- Always build them from `$HOME`. Never use a relative path: this repo has its own skill-tutor-tutorials folder, which must never be touched.
+- Never touch anything inside this repo. That includes the repo's local settings file (.claude/settings.local.json) and the repo's own skill-tutor-tutorials folder. A path counts as inside this repo when its real location is inside it, after resolving symlinked parent folders, and also when this repo lives inside the path (a clone placed in `~/skill-tutor-tutorials/`, say): a tester may have linked `~/.claude/commands` to this repo's `.claude/commands`. The blocks below check this and print `SKIP` for such a path. Leave a `SKIP` path alone.
+- Never touch an earlier backup folder (`~/skill-tutor-tutorials-backup-…`).
+- Move, never destroy. This section has no command that destroys files, and you must not run one. If any step fails, stop and report the error. Never retry with force.
+- When in doubt, keep.
+
+### Step 1 — Find and show
+
+Run this as **one** Bash tool call (on native Windows without Git Bash, run the PowerShell block instead):
+
+```bash
+: "${HOME:?HOME is not set}"
+repo=$(cd -P "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" && pwd -P)
+inside_repo() {
+  d=$(cd -P "$(dirname "$1")" 2>/dev/null && pwd -P) || return 1
+  r="$d/$(basename "$1")"
+  case "$r/" in "$repo"/*) return 0 ;; esac
+  case "$repo/" in "$r"/*) return 0 ;; esac
+  return 1
+}
+for p in "$HOME/skill-tutor-tutorials" "$HOME/.claude/commands/learn.md" "$HOME/.claude/commands/learn"; do
+  if [ -e "$p" ] || [ -L "$p" ]; then
+    if inside_repo "$p"; then echo "SKIP $p (it is inside this repo, or the repo is inside it)"; continue; fi
+    echo "FOUND $p"
+    echo "  entries: $(find "$p" | wc -l | tr -d ' ')"
+    echo "  newest:  $(find "$p" -exec ls -ldt {} + | head -n 1)"
+    find "$p" -type l -exec ls -ld {} +
+  fi
+done
+```
+
+```powershell
+$ErrorActionPreference = 'Stop'
+if (-not $HOME) { throw 'HOME is not set' }
+function Get-Entries([string]$Path) {
+  $item = Get-Item -LiteralPath $Path -Force
+  $item
+  if ($item.PSIsContainer -and -not $item.LinkType) {
+    Get-ChildItem -LiteralPath $Path -Force | ForEach-Object { Get-Entries $_.FullName }
+  }
+}
+function Test-InRepo([string]$Path) {
+  $sep = [System.IO.Path]::DirectorySeparatorChar
+  $ic = [System.StringComparison]::OrdinalIgnoreCase
+  $repo = $null
+  if (Get-Command git -ErrorAction SilentlyContinue) {
+    try { $repo = & git rev-parse --show-toplevel 2>$null | Select-Object -First 1 } catch { $repo = $null }
+  }
+  if (-not $repo) { $repo = (Get-Location).Path }
+  $repo = (Resolve-Path -LiteralPath $repo).ProviderPath.TrimEnd('\', '/') + $sep
+  $full = [System.IO.Path]::GetFullPath($Path).TrimEnd('\', '/') + $sep
+  if ($full.StartsWith($repo, $ic) -or $repo.StartsWith($full, $ic)) { return $true }
+  $d = Split-Path -Parent $Path
+  while ($d -and ($d -ne $HOME) -and (Test-Path -LiteralPath $d)) {
+    $it = Get-Item -LiteralPath $d -Force
+    if ($it.LinkType) {
+      $t = @($it.Target)[0]
+      if (-not [System.IO.Path]::IsPathRooted($t)) { $t = Join-Path (Split-Path -Parent $d) $t }
+      if (([System.IO.Path]::GetFullPath($t).TrimEnd('\', '/') + $sep).StartsWith($repo, $ic)) { return $true }
+    }
+    $d = Split-Path -Parent $d
+  }
+  return $false
+}
+foreach ($p in @((Join-Path $HOME 'skill-tutor-tutorials'), (Join-Path $HOME '.claude\commands\learn.md'), (Join-Path $HOME '.claude\commands\learn'))) {
+  if (Get-Item -LiteralPath $p -Force -ErrorAction SilentlyContinue) {
+    if (Test-InRepo $p) { "SKIP $p (it is inside this repo, or the repo is inside it)"; continue }
+    $entries = @(Get-Entries $p)
+    "FOUND $p"
+    "  entries: $($entries.Count)"
+    "  newest:  $(($entries | Sort-Object LastWriteTime -Descending | Select-Object -First 1).LastWriteTime)"
+    $entries | Where-Object { $_.LinkType } | ForEach-Object { "  link: $($_.FullName) -> $($_.Target)" }
+  }
+}
+```
+
+- `find` without `-L` never follows a symlink: a symlink counts as **one** entry, and its target is printed next to it. The bash block uses only commands that behave the same on GNU (Linux, WSL) and BSD (macOS). The PowerShell block uses `Get-Item -Force`, which also finds a dangling symlink.
+- The entry count is always exact. For a very large folder, `find … -exec ls -ldt {} +` can split into batches, so the "newest" line is then only approximate.
+- A `SKIP` line is not a leftover: the path is inside this repo, or this repo is inside it, so ignore it everywhere below. Count only the `FOUND` paths.
+- **If nothing is found** (no `FOUND` line): say, in Hebrew, "לא נמצאו שאריות מהתקנה קודמת." and continue to section 0.1.
+- **Otherwise:** show each path found with its entry count, its newest modification date and any symlink targets, and remember the counts for Step 4.
+
+### Step 2 — Ask
+
+Use `AskUserQuestion`:
+
+```
+question: "נמצאו נתוני למידה או התקנה קודמת של /learn (כולל ההתקדמות שלך, אם התחלת ללמוד). מה לעשות איתם?"
+header: "ניקוי התקנה"
+options:
+  - label: "להשאיר הכל"
+    description: "שום דבר לא זז. ממשיכים בהגדרה."
+  - label: "להעביר לגיבוי ולהתחיל מחדש"
+    description: "הכל עובר לתיקייה ~/skill-tutor-tutorials-backup-<תאריך>. שום דבר לא הולך לאיבוד."
+```
+
+Only `להעביר לגיבוי ולהתחיל מחדש` is a yes. Any other answer, including free text, means keep: touch nothing and continue to section 0.1.
+
+### Step 3 — Move
+
+Run the whole move as **one single** Bash tool call (or one PowerShell call), never split across calls: shell variables do not survive between tool calls.
+
+```bash
+: "${HOME:?HOME is not set}"
+ts=$(date +%Y%m%d-%H%M%S)
+dest="$HOME/skill-tutor-tutorials-backup-$ts"
+: "${dest:?dest is not set}"
+repo=$(cd -P "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" && pwd -P)
+inside_repo() {
+  d=$(cd -P "$(dirname "$1")" 2>/dev/null && pwd -P) || return 1
+  r="$d/$(basename "$1")"
+  case "$r/" in "$repo"/*) return 0 ;; esac
+  case "$repo/" in "$r"/*) return 0 ;; esac
+  return 1
+}
+move_aside() {
+  if [ -e "$1" ] || [ -L "$1" ]; then
+    if inside_repo "$1"; then echo "SKIP $1 (it is inside this repo, or the repo is inside it)"; return 0; fi
+    mv "$1" "$2" || exit 1
+  fi
+}
+mkdir "$dest" && mkdir "$dest/commands" || exit 1
+move_aside "$HOME/skill-tutor-tutorials" "$dest/"
+move_aside "$HOME/.claude/commands/learn.md" "$dest/commands/"
+move_aside "$HOME/.claude/commands/learn" "$dest/commands/"
+echo "BACKUP $dest"
+for p in "$HOME/skill-tutor-tutorials" "$HOME/.claude/commands/learn.md" "$HOME/.claude/commands/learn"; do
+  if { [ -e "$p" ] || [ -L "$p" ]; } && ! inside_repo "$p"; then echo "STILL PRESENT $p"; fi
+done
+for b in "$dest/skill-tutor-tutorials" "$dest/commands/learn.md" "$dest/commands/learn"; do
+  if [ -e "$b" ] || [ -L "$b" ]; then echo "IN BACKUP $b entries: $(find "$b" | wc -l | tr -d ' ')"; fi
+done
+```
+
+```powershell
+$ErrorActionPreference = 'Stop'
+if (-not $HOME) { throw 'HOME is not set' }
+function Get-Entries([string]$Path) {
+  $item = Get-Item -LiteralPath $Path -Force
+  $item
+  if ($item.PSIsContainer -and -not $item.LinkType) {
+    Get-ChildItem -LiteralPath $Path -Force | ForEach-Object { Get-Entries $_.FullName }
+  }
+}
+function Test-InRepo([string]$Path) {
+  $sep = [System.IO.Path]::DirectorySeparatorChar
+  $ic = [System.StringComparison]::OrdinalIgnoreCase
+  $repo = $null
+  if (Get-Command git -ErrorAction SilentlyContinue) {
+    try { $repo = & git rev-parse --show-toplevel 2>$null | Select-Object -First 1 } catch { $repo = $null }
+  }
+  if (-not $repo) { $repo = (Get-Location).Path }
+  $repo = (Resolve-Path -LiteralPath $repo).ProviderPath.TrimEnd('\', '/') + $sep
+  $full = [System.IO.Path]::GetFullPath($Path).TrimEnd('\', '/') + $sep
+  if ($full.StartsWith($repo, $ic) -or $repo.StartsWith($full, $ic)) { return $true }
+  $d = Split-Path -Parent $Path
+  while ($d -and ($d -ne $HOME) -and (Test-Path -LiteralPath $d)) {
+    $it = Get-Item -LiteralPath $d -Force
+    if ($it.LinkType) {
+      $t = @($it.Target)[0]
+      if (-not [System.IO.Path]::IsPathRooted($t)) { $t = Join-Path (Split-Path -Parent $d) $t }
+      if (([System.IO.Path]::GetFullPath($t).TrimEnd('\', '/') + $sep).StartsWith($repo, $ic)) { return $true }
+    }
+    $d = Split-Path -Parent $d
+  }
+  return $false
+}
+$dest = Join-Path $HOME ('skill-tutor-tutorials-backup-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+if (-not $dest) { throw 'dest is not set' }
+New-Item -ItemType Directory -Path $dest | Out-Null
+New-Item -ItemType Directory -Path (Join-Path $dest 'commands') | Out-Null
+$moves = @(
+  @((Join-Path $HOME 'skill-tutor-tutorials'), $dest),
+  @((Join-Path $HOME '.claude\commands\learn.md'), (Join-Path $dest 'commands')),
+  @((Join-Path $HOME '.claude\commands\learn'), (Join-Path $dest 'commands'))
+)
+foreach ($m in $moves) {
+  if (Get-Item -LiteralPath $m[0] -Force -ErrorAction SilentlyContinue) {
+    if (Test-InRepo $m[0]) { "SKIP $($m[0]) (it is inside this repo, or the repo is inside it)"; continue }
+    Move-Item -LiteralPath $m[0] -Destination $m[1] -ErrorAction Stop
+  }
+}
+"BACKUP $dest"
+foreach ($m in $moves) { if ((Get-Item -LiteralPath $m[0] -Force -ErrorAction SilentlyContinue) -and -not (Test-InRepo $m[0])) { "STILL PRESENT $($m[0])" } }
+foreach ($b in @((Join-Path $dest 'skill-tutor-tutorials'), (Join-Path $dest 'commands\learn.md'), (Join-Path $dest 'commands\learn'))) {
+  if (Get-Item -LiteralPath $b -Force -ErrorAction SilentlyContinue) { "IN BACKUP $b entries: $(@(Get-Entries $b).Count)" }
+}
+```
+
+- `mv` and `Move-Item` move a symlink as a link; they never follow it.
+- **On any error:** stop and report it. Never retry with force.
+- **Across filesystems** (e.g. `~/.claude/commands` is a symlink into `/mnt/c/…`), `mv` copies and then removes the original. An interruption leaves the original intact, or both copies, but never neither. So nothing is lost.
+
+### Step 4 — Verify and report
+
+Check the output: no `STILL PRESENT` line (a `SKIP` path is not one), and each `IN BACKUP` entry count equals the count shown in Step 1. If anything differs, stop and report it. Otherwise tell the learner, in Hebrew, the backup path from the `BACKUP` line.
+
+### Step 5 — Continue or stop
+
+- If `~/.claude/commands/learn.md` or `~/.claude/commands/learn/` was moved: stop setup here. Tell the tester, in Hebrew, to close Claude Code, open it again in this repo and run `/learn setup` again. Do not continue in this session.
+- Otherwise continue to section 0.1.
+<!-- CLEAN-SLATE:END -->
+
+---
+
+## 0.1 Claude Code version
+
+*Runs on every `/learn setup`, including a first run with no settings file.*
+
+**Floor:** 2.1.176
+
+1. Run `claude --version`. If `claude` is not found (e.g. a Desktop-bundled install with no `claude` on PATH), skip this section silently and continue to section A.
+2. Take the first `major.minor.patch` version in the output (e.g. `2.1.284 (Claude Code)` gives `2.1.284`).
+3. Compare it with the floor **numerically, one component at a time**: major first, then minor, then patch. Never compare the two strings as text: `2.1.99` is lower than `2.1.100`, although it sorts higher as text.
+4. If it is lower than the floor, show the warning below **as its own message, word for word**. Replace `INSTALLED` with the version from step 2 and `FLOOR` with the **Floor** value at the top of this section. **Both numbers must appear.** Do not shorten or paraphrase the sentence, and do not merge it with any other message (such as the result of the clean-slate step). Then continue to section A:
+   > "גרסת Claude Code שלך (INSTALLED) ישנה מהגרסה המינימלית שהקורס צריך (FLOOR). כדי לעדכן, הריצו בטרמינל: `claude update`"
+5. Otherwise continue to section A without a message.
+
+*Limitation:* `claude --version` reports whichever `claude` comes first on PATH, which may not be the binary running this session.
 
 ---
 
@@ -276,41 +510,7 @@ Save `~/skill-tutor-tutorials/settings.json`:
 
 ---
 
-## F. Global Install (optional)
-
-By default `/learn` works inside this repo — no install needed. Global install is only useful if the learner wants to run `/learn` from *other* projects (a future cross-repo use case).
-
-**Note the trade-off:** a global copy is a second source of truth. If the repo's modules are later edited, the global copy goes stale until re-synced. Most learners should say no.
-
-Use the `AskUserQuestion` tool:
-
-```
-question: "להתקין את /learn גם בפרויקטים אחרים? (רוב הלומדים: לא)"
-header: "התקנה גלובלית"
-options:
-  - label: "לא, רק בריפו הזה"
-    description: "/learn יעבוד בתוך הריפו. מומלץ — אין עותק כפול שעלול להתיישן."
-  - label: "כן, התקן גלובלית"
-    description: "אעתיק את המודולים ל-~/.claude/commands כדי שאפשר יהיה להשתמש מכל מקום."
-```
-
-**If no:** skip — confirm settings are saved and `/learn` is ready inside this repo.
-
-**If yes:** copy the skill files to the global Claude commands folder, then warn that future repo edits require re-running setup to re-sync.
-
-```powershell
-$dest = "$env:USERPROFILE\.claude\commands"
-if (!(Test-Path $dest)) { New-Item -ItemType Directory -Force -Path $dest | Out-Null }
-Copy-Item -Force "$PWD\.claude\commands\learn.md" "$dest\learn.md"
-
-$moduleDest = "$dest\learn"
-if (!(Test-Path $moduleDest)) { New-Item -ItemType Directory -Force -Path $moduleDest | Out-Null }
-Copy-Item -Force "$PWD\.claude\commands\learn\*.md" "$moduleDest\"
-```
-
----
-
-## G. Setup Complete — REQUIRED
+## F. Setup Complete — REQUIRED
 
 **You MUST always send this message after completing all steps above, regardless of which options the learner chose.**
 

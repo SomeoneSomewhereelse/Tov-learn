@@ -6,6 +6,10 @@
 
 # Tov-learn
 
+<!-- TEMPORARY: remove at first-cohort gate (PRD D10) -->
+> **Testers: fresh install only.** Before testing, delete `~/skill-tutor-tutorials/` (`%USERPROFILE%\skill-tutor-tutorials` on Windows) and any old global install at `~/.claude/commands/learn.md` and `~/.claude/commands/learn/` — or run `/learn setup`, which offers to move them into a backup for you. **If `~/.claude/commands/learn.md` exists and `/learn setup` doesn't offer to move it, you have an older global install: move or delete `~/.claude/commands/learn.md` and `~/.claude/commands/learn/` by hand, then restart Claude Code.**
+<!-- /TEMPORARY -->
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Built for Claude Code](https://img.shields.io/badge/Built%20for-Claude%20Code-blueviolet)](https://claude.ai/code)
 [![Spaced Repetition](https://img.shields.io/badge/Learning-Spaced%20Repetition-green)](https://en.wikipedia.org/wiki/Spaced_repetition)
@@ -22,7 +26,7 @@ Interactive AI tutor, built as a Claude Code skill.
 
 ### Step 1 — Prerequisites
 
-- [Claude Code](https://claude.ai/code) installed (Pro plan or higher)
+- [Claude Code](https://claude.ai/code) 2.1.176 or later installed (Pro plan or higher)
 - Git
 
 ### Step 2 — Clone and open
@@ -43,7 +47,6 @@ This will:
 - Ask for your preferred session language (Hebrew / English)
 - Let you pick a course — the active course is **AI Dev** (default)
 - Optionally configure a TTS voice
-- Optionally install `/learn` globally so it works in other projects (off by default — most learners keep it repo-local)
 
 That's it. Type `/learn 0.1` to start the first lesson.
 
@@ -69,7 +72,7 @@ To start a lesson:
 /learn 0.1
 ```
 
-The tutor loads the script, greets you, asks what you already know, and walks through each section interactively. At any point you can type `quiz me` to test yourself, or `stop` to end the session and get a next-step recommendation.
+The tutor loads the script, greets you, asks what you already know, and walks through each section interactively. At any point you can type `quiz me` (or `בוחן`) to test yourself, or `stop` (or `עצור` / `סיום`) to end the session and get a next-step recommendation.
 
 ### Analyzing your own project
 
@@ -114,12 +117,12 @@ Generates an HTML file at `~/skill-tutor-tutorials/dashboard.html` showing all l
 
 | Command | Action |
 |---------|--------|
-| `continue` | Move to the next section |
-| `quiz me` | 4-question quiz on everything covered so far |
+| `continue` / `המשך` | Move to the next section |
+| `quiz me` / `בוחן` | 4-question quiz on everything covered so far |
 | `explain again` | Re-explain current section from a different angle |
 | `summary` | Bullet-point recap of what was covered |
 | `exercises` | Show this lesson's exercises |
-| `stop` | End session — shows what's covered, what's left, next recommendation |
+| `stop` / `עצור` / `סיום` | End session — shows what's covered, what's left, next recommendation |
 | `read aloud` | Speak the last response (on-demand TTS) |
 | `settings` | Show current language, TTS, and course path |
 
@@ -197,15 +200,15 @@ CLAUDE.md                   ← architecture overview for contributors
 ## Adding a New Module
 
 1. Create `.claude/commands/learn/[module-name].md`
-2. Add a row to the modules table in `CLAUDE.md`
-3. Add a routing entry in `learn.md` (Step 2 — Route table)
-4. Update the global install command in `setup.md`
+2. Start the file with the `disable-model-invocation: true` frontmatter block (three lines: `---`, `disable-model-invocation: true`, `---`), so Claude can't invoke the module as a command on its own
+3. Add a row to the modules table in `CLAUDE.md`
+4. Add a routing entry in `learn.md` (Step 2 — Route table)
 
 ---
 
 ## Requirements
 
-- Claude Code (Pro plan or higher)
+- Claude Code 2.1.176 or later (Pro plan or higher)
 - Windows (for TTS voice support) — TTS can be disabled on any OS
 
 ## License

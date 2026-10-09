@@ -1,6 +1,9 @@
+---
+disable-model-invocation: true
+---
 # Progress Module
 
-*Loaded after covering at least one section, and on the "stop" command.*
+*Loaded after covering at least one section, and on the "stop / עצור / סיום" command.*
 
 Respond in `session.language` throughout. Address the learner using `session.address`.
 
@@ -96,7 +99,7 @@ Update `~/skill-tutor-tutorials/learner_profile.md` — add/update `## Lessons S
 
 ---
 
-## Session End (on "stop" command)
+## Session End (on "stop / עצור / סיום" command)
 
 After saving all files, display a session summary:
 - What was covered

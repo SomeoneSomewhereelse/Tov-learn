@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Export Module — ייצוא נתוני תלמיד
 
 Export all learner data from `~/skill-tutor-tutorials/` to a ZIP file that can be transferred to another device or kept as a backup.

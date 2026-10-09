@@ -19,6 +19,8 @@
    - `[X.Y]_exercises.md` — 2–4 exercises, one per concept
 4. Update `courses/[course-name]/COURSE.md` with the new lesson row
 
+**CI checks every lesson** (see `tests/validate_structure.py`): each script has at least 5 `[מעבר שקף]` markers; the exercises' first heading contains `שיעור X.Y`, and any `**שיעור:**` line names the same lesson; `COURSE.md` has a row for the lesson and a correct module range; and spoken lesson references (e.g. "שתיים נקודה אחת") name lessons that exist. The example below predates these rules; F rewrites it.
+
 **Script format:**
 ```
 Title: [Lesson Title]
@@ -56,9 +58,9 @@ Modules live in `.claude/commands/learn/`. Each module is a standalone markdown 
 
 **To add a new module:**
 1. Create `.claude/commands/learn/[module-name].md`
-2. Add a routing entry in `.claude/commands/learn.md` (Step 2 — Route table)
-3. Add a row to the modules table in `CLAUDE.md`
-4. Update the global install `Copy-Item` command in `setup.md`
+2. Start the file with the `disable-model-invocation: true` frontmatter block (three lines: `---`, `disable-model-invocation: true`, `---`), so Claude can't invoke the module as a command on its own
+3. Add a routing entry in `.claude/commands/learn.md` (Step 2 — Route table)
+4. Add a row to the modules table in `CLAUDE.md`
 
 ---
 
@@ -66,4 +68,5 @@ Modules live in `.claude/commands/learn/`. Each module is a standalone markdown 
 
 - One PR per change (lesson, module, or fix)
 - Test the flow manually with `/learn` before opening the PR
+- Run `uv run ruff check -q && uv run pytest -q` before opening a PR (contributors need [uv](https://docs.astral.sh/uv/getting-started/installation/)). `git add` new files first: most lints read only files git knows about, as CI does, so an untracked file is invisible locally
 - Describe what the learner experience looks like after your change

@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Resume Module
 
 *Loaded when /learn is called with no arguments. Replaces the static "lesson or project analysis?" prompt with a smart suggestion based on actual progress.*
@@ -20,7 +23,7 @@ Compute today's date. Classify each lesson:
 - **In progress** — started, score under 8, not yet due
 - **Next new** — first lesson in COURSE.md with no progress file
 
-Check final project eligibility: learner is ready to start the final project if they have progress files for lessons in module 2 (any lesson 2.x), or have completed all lessons through 1.8.
+**TEMPORARY (until unit 1e): do not offer the final project.** Skip the final-project eligibility check, and never show a 🏗️ line in Step 2. Unit 1e restores both.
 
 ---
 
@@ -35,7 +38,6 @@ Welcome back. Here's where things stand:
 🔁 Due for review: Lesson [X.X] — [title] ([N] days overdue)
 📖 Next new lesson: [X.X] — [title]
 🔍 Project analysis
-[if eligible: 🏗️ Final Project — [show "starting" or current phase if already selected]]
 
 What would you like to do?
 ```
@@ -47,7 +49,6 @@ Welcome back. You're up to date on reviews.
 📖 Continue: Lesson [X.X] — [title] (in progress)
 📖 Next new lesson: [X.X] — [title]
 🔍 Project analysis
-[if eligible: 🏗️ Final Project — [show "starting" or current phase if already selected]]
 
 What would you like to do?
 ```

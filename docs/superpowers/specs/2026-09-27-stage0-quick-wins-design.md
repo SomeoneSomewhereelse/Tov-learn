@@ -1,6 +1,6 @@
 # Stage 0 — Quick-Win PR: Design Spec
 
-**Date:** 2026-09-27 · **Revision:** 6.1 (2026-09-29), after five independent reviews and the plan review (§10) · **Status:** **locked** by the user (2026-09-29); rev 6.1 is editorial only (no decision changed). Plan: `docs/superpowers/plans/2026-09-29-stage0-quick-wins.md`
+**Date:** 2026-09-27 · **Revision:** 6.5 (2026-10-09), after five independent reviews, the plan review, the final branch review and the Hebrew style decisions (§4.2 "Voice", §10) · **Status:** **locked** by the user (2026-09-29); rev 6.1 is editorial only (no decision changed). Rev 6.2 records the fixes from the final branch review (§10); it changes S5's guard, two lint rules and four content items. Plan: `docs/superpowers/plans/2026-09-29-stage0-quick-wins.md`
 **Parent:** `docs/prds/project-redesign-2026-09-25.md` (the PRD). References such as "D2 item 5", "§3" and "R14" point there. "Review §2.x" points to `docs/reviews/project-review-2026-09-24.md`. "RV-…" through "RV5-…" point to the spec reviews (§10).
 **Baseline:** `master` at `290af75` (= `origin/master`, after #12 and #13 were merged on 2026-09-28). Its tree is identical to the earlier local `d04ca2a` (tree `5bf8edb`), so every line number below refers to that tree.
 **Scope:** Stage 0 only:
@@ -152,6 +152,8 @@ All 19 `[SLIDE TRANSITION]` → `[מעבר שקף]`. No other *marker* change. I
   - script title lines in 0.2, 0.3 and 0.4, including "Lesson 0.3" in both places in the opening
 - **Spoken lesson numbers.** The full inventory, built with the S17 parser: every digit-table form (including שישה/שבעה/ארבעה…) and one-letter prefixes (RV3-H1, H2). Each is rewritten to the real lesson:
 
+  The "Becomes" spelled forms below were first applied as spelled numbers (rev 6.1/6.2). Under the Voice rules (rev 6.3) they are written as numerals, e.g. "אחת נקודה X" is "1.X" and "שתיים נקודה X" is "2.X"; the lesson each reference names is unchanged.
+
   | File:line | Now | Becomes |
   |---|---|---|
   | `1.1:1`, `1.2:1`, `1.3:1`, `1.4:1` (self), `1.5:1`, `1.6:1`, `1.8:2` | "שלוש נקודה X" (self) | "אחת נקודה X" |
@@ -193,7 +195,12 @@ All 19 `[SLIDE TRANSITION]` → `[מעבר שקף]`. No other *marker* change. I
   - `2.1_script.txt:5`: → a bridge from Module 01.
   - `2.6_script.txt:77`: cut the "module 6 / lesson 6.1" teaser. The closing summary stays. There's no bridge to the final project, because Stage 0 disables it (RV2-L12).
 - **Leaked preambles (G1).** In `1.8`, `2.3` and `2.6_exercises.md`, delete line 1 and the blank/`---` lines that follow it, up to `<div dir="rtl" lang="he">`.
-- **Voice:** replacement Hebrew matches the file. It's reviewed by a Hebrew-speaking contributor.
+- **Voice:** replacement Hebrew matches the file. It's reviewed by a Hebrew-speaking contributor. **Hebrew style rules (user decision, 2026-10-04), which the replacement Hebrew follows. Readers are assumed to read English, so not everything is translated verbatim:**
+  1. **Numbers are numerals.** Lesson, module and version numbers, exit codes and years are written as digits, not spelled out: "1.3", "מודול 2", "2.1.176", "exit code 2", "2026" (not "אחת נקודה שלוש", "מודול שתיים", "שתיים נקודה אחת נקודה מאה שבעים ושש", "קוד יציאה שתיים", "אלפיים עשרים ושש"). A Hebrew prefix letter is hyphenated: "ב-1.3", "ו-1.5", "ל-production". Counts and ordinals that aren't labels stay words ("ארבעה מודולים", "השיעור השביעי", "רמות שלוש וארבע").
+  2. **Technical terms stay in English:** file names and paths (`secret-demo.txt`, `.claude/settings.json`), tool and event names (`PreToolUse`, `Read`), and product, tool, protocol and technical terms (Claude, Claude Code, Anthropic, hooks, skills, session, loop, routines, webhooks, JSON, MCP, Next.js, Tailwind, GitHub, Stripe, WhatsApp, Cloudflare, Supabase, USB-C, CLAUDE.md, exit code). Acronyms that were spelled out by letter are written as the acronym ("אם-סי-פי" is "MCP", "יו אר אל" is "URL"). Not "פרי טול יוז", "נוטס נקודה טי אקס טי", "קלוד נקודה אם די" or "קוד ריוויו". Person names stay Hebrew ("קלוד שאנון"). Everyday loanwords (פרויקט, אפליקציה, לפטופ) stay Hebrew; the softer technical loanwords (טרמינל, פרומפט, פיצ'ר, דאטה, צ'אט, פרודקשן, דומיין, באג and similar) **stay Hebrew** (maintainer decision, 2026-10-09).
+  3. **Don't translate verbatim.** Prefer the term the reader will see on screen.
+  **Scope: the whole course, where applicable.** Stage 0 applies the rules, in full and not only on the lines it changed, to every script and exercise file it touches (30 files under `courses/ai-dev/lessons/00-*` to `02-*`; 23 of them changed), for the terms and acronyms listed in rule 2. It does not touch the other files, because edits stay minimal and every rewrite stays with its Stage 1 slice. Every other script, exercise and tutor file follows with the unit that owns it (§9: F's style guide, 1a, 1b, 1c, 1d, 1e). "Where applicable" excludes counts and ordinals (rule 1) and quoted learner-facing text that has to match what a tool prints. **Consequences for the lints:** `spoken_lesson_refs` only parses spelled numbers, so a converted reference is no longer checked until N's manifest replaces the lint. And each unit that converts a phrase listed in `SPOKEN_ALLOWLIST` (OAuth 2.0, Opus 4.6, Python 3.13/3.14 and so on) must delete that entry in the same commit, or the stale-entry rule reports it.
+  **Open check, pending:** the TTS voice (S2b) must be listened to on a converted lesson (1.3 is the densest). Numerals such as "2.1.176" and Latin-script terms may be pronounced differently from the spelled forms. The maintainer will listen to it later; the PR carries it as pending.
 - **Known churn:** 1b renumbers 0.x again. `0.1_script.txt:125` ("next lesson: a practical tour of Claude Code, Cursor, Copilot") doesn't describe today's 0.2. It's left for 1b's reorder, which is expected to make it true again (RV3-L10).
 
 #### Item 10: the 1.3 hook exercise
@@ -235,7 +242,7 @@ All 19 `[SLIDE TRANSITION]` → `[מעבר שקף]`. No other *marker* change. I
 
 **Related edits:**
 - `1.3_exercises.md:8`: "v2.1.59+" → "v2.1.176+".
-- `1.3_script.txt:15`: the sentence becomes a **lesson-wide** requirement ("לשיעור הזה צריך קלוד קוד בגרסה שתיים נקודה אחת נקודה מאה שבעים ושש ומעלה"), not an auto-memory one. The facts at `:3` and `:11` about when auto memory arrived stay (S14, RV3-L5).
+- `1.3_script.txt:15`: the sentence becomes a **lesson-wide** requirement ("לשיעור הזה צריך Claude Code בגרסה 2.1.176 ומעלה", in the style of the Voice rules), not an auto-memory one. The facts at `:3` and `:11` about when auto memory arrived stay (S14, RV3-L5).
 - `1.3_script.txt:25`: soften "חוסם פעולה באופן מוחלט" to "deterministic for the tool call it matches".
 - `1.3_script.txt:27`: the exit-2 vs exit-1 correction.
 - `1.3_script.txt:29`: the read-guard demo. No deletion, and no Python-bypass suggestion.
@@ -330,6 +337,7 @@ All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n--
    ```
    - **The whole move runs as one single Bash (or PowerShell) tool invocation**, never split across calls, because shell variables don't survive between tool calls. The block guards `: "${dest:?}"` right after computing `dest`, before the first `mv` (RV5-M5).
    - `mv` moves a symlink as a link and never follows it. PowerShell uses `Move-Item -LiteralPath … -ErrorAction Stop`, after checking `$HOME` and `$dest` are non-empty.
+   - **Never inside the repo, even through a symlinked parent (final-review M2).** A tester may have linked `~/.claude/commands` to the repo's `.claude/commands`; `mv "$HOME/.claude/commands/learn.md"` would then move the repo's own file. Both Step 1 (find) and Step 3 (move) first resolve each path's real parent folder (`cd -P … && pwd -P`; in PowerShell, any link among the parents whose target lies inside `git rev-parse --show-toplevel`). The same check also skips a path that *contains* the repo (a clone placed in `~/skill-tutor-tutorials/`). A path whose real location overlaps the repo either way prints `SKIP …`, is never counted, never moved and never reported as `STILL PRESENT`. Moving the final path component itself (a link) is still allowed.
    - On any error: stop and report. Never retry with force, and never delete.
    - **Across filesystems (RV3-M4).** If a source sits on another filesystem (e.g. `~/.claude/commands` symlinked to `/mnt/c/…`), `mv` copies and then removes the original. An interruption leaves the original intact, or both copies, but never neither. The step claims "nothing is lost", not "nothing is unlinked".
 5. **Verify and report.** Each original path is gone and present in the backup. The backup's **entry counts, taken the same no-follow way, equal the counts shown in step 2** (RV3-M4, RV4-L4). Print the backup path.
@@ -349,7 +357,7 @@ All 15 `learn/*.md` files get a leading `---\ndisable-model-invocation: true\n--
 - **Behaviour:**
   - Run `claude --version` and take the first `X.Y.Z`.
   - Compare it with 2.1.176 **numerically, component by component (major, then minor, then patch), never as text** (RV2-L2).
-  - If it's lower, show a short Hebrew warning and the update command (`claude update`), then continue.
+  - If it's lower, show a short Hebrew warning that names **both** versions (installed and floor) and gives the update command (`claude update`), as its own message and word for word, then continue. Manual check 2b found the tutor paraphrasing it and dropping the floor.
   - If `claude` isn't on PATH (e.g. Desktop-bundled installs, the PRD D9a route), skip silently.
   - **Limitation (RV3-L4):** `claude --version` reports whichever `claude` is on PATH, which may not be the running binary; no version variable is exposed (§3). The PR notes both limitations.
 
@@ -402,7 +410,7 @@ Written once, as the last commit of group D, appended after the existing section
 - **Course scope:** `courses/*/` except `courses/_archive/`, skipping `old_B*` files.
 - **File discovery (RV2-L8):** a helper `repo_files(root, pattern)`:
   - uses `git ls-files -z` when `root/.git` exists, **as a file or a directory** (in a worktree `.git` is a file; RV5-L4), so local results match CI, and non-ASCII paths come out unquoted. Entries missing on disk (deleted in the working tree) are skipped (RV4-L10)
-  - otherwise walks the filesystem (the pytest fixture trees)
+  - otherwise walks the filesystem (the pytest fixture trees), and so does a repo whose `git` executable is missing or whose `.git` git refuses to read (final-review L4, second-review L6)
 
 | Check | Rule |
 |---|---|
@@ -413,7 +421,7 @@ Written once, as the last commit of group D, appended after the existing section
 | `course_name_denylist` | No `קורס\s+(ה-)?AI Engineer`, `\*\*קורס:\*\*\s*AI Engineer` or `AI Engineer course` (case-insensitive) in course scope. The job title passes. **Plus (S19):** `NEXT_PUBLIC_SUPABASE_ANON_KEY`. The check keeps its name, since F renames it into the full denylist |
 | `tutor_refs` | In `.claude/**/*.md`:<br>(a) backticked paths starting with `.claude/` or `courses/` exist, except `LOCAL_ONLY = {".claude/settings.local.json"}`<br>(b) a backticked bare `name.md` directly after a word-bounded `Read`/`Load` (any case) exists in the referring file's folder<br>Skips `~/…` and placeholders (`[`, `{`, `*`, `X.Y`). **`${CLAUDE_SKILL_DIR}` resolution is M's extension (§9; RV2-M4)** |
 | `settings_json` | `.claude/settings.json`, if present, parses, and contains no `powershell` (case-insensitive) |
-| `relative_links` | In every tracked `*.md`, after removing fenced blocks and inline code spans, every `[text](target)` that isn't `http:`/`https:`/`mailto:`/`#…` resolves (after stripping `#fragment`). Skips `_archive/` and `old_B*` |
+| `relative_links` | In every tracked `*.md`, after removing fenced blocks and inline code spans, every `[text](target)` that isn't `http:`/`https:`/`mailto:`/`#…` resolves (after stripping `#fragment`; a target starting with `/` is relative to the repo root, as on GitHub). Skips `_archive/` and `old_B*` |
 | `clean_slate_no_delete` | *Temporary.* Between the CLEAN-SLATE markers in `setup.md`, matched **case-insensitively** (PowerShell ignores case; RV5-L2): no `\brm\b`, `\brmdir\b`, `\bdel\b`, `\berase\b`, `\brd\b`, `\bri\b`, `Remove-Item`, `\bunlink\b`, `-delete\b`, `rmtree`, `::Delete\(`. **Both markers must be present in `setup.md`; a missing marker is a finding** (RV3-M5). The check is deleted together with the section at the gate |
 | `lesson_files` *(existing)* | Every lesson folder has `*_script.txt` and `*_exercises.md`; course-scoped |
 | `teaching_step5` *(existing)* | `teaching.md` contains "Step 5" |
@@ -437,7 +445,7 @@ Written once, as the last commit of group D, appended after the existing section
   - `course_name_denylist`: `בקורס AI Engineer`; `- **קורס:** AI Engineer`; `NEXT_PUBLIC_SUPABASE_ANON_KEY`
   - `tutor_refs`: a missing `.claude/…` route; `Read \`missing.md\``
   - `settings_json`: `powershell`; invalid JSON
-  - `relative_links`: a missing target
+  - `relative_links`: a missing target; a root-absolute link (`/docs/gone.md`) to a missing file
   - `clean_slate_no_delete`: `rm -rf`; `Remove-Item`; lower-case `remove-item`; `[IO.Directory]::Delete(`; the END marker missing
   - `lesson_files`: missing exercises
   - `teaching_step5`: "Step 5" removed
@@ -446,11 +454,13 @@ Written once, as the last commit of group D, appended after the existing section
   - denied strings in `_archive/` and `old_B-x.md`
   - `~/…`; `.claude/settings.local.json`; `${CLAUDE_SKILL_DIR}/x.md`
   - "already … `x.md`"; "load … from `projects.md`"
+  - a root-absolute link (`/README.md`) that resolves
   - `http(s)` and `#anchor` links; a broken link in a code fence and in inline code
   - spelled numbers followed by `,` `:` `.`
   - an allowlisted phrase; a spoken reference to an existing lesson
   - "Confirm", "model" and "perform" between the markers; `rm` outside them
   - a missing `settings.json`
+- **Behavioural tests of the clean-slate blocks (final-review M2).** They run the real bash blocks of `setup.md` Steps 1 and 3 against a fake `HOME` and a fake repo: a symlinked `~/.claude/commands` leaves the repo's files alone; a real global install is still moved; the find step prints `SKIP`; a folder that contains the repo is skipped by both steps. A further test makes `repo_files` fall back to walking when `git` is missing, and `test_worktree_git_file` pins `commit.gpgsign=false` and `core.hooksPath=/dev/null`.
 - **`test_real_repo_passes`:** every check on the real repo, with the findings in the assertion message. Red until groups C and T land: it turns green at the T5 (clean-slate) commit, and group D must keep it green.
 
 ### 5.3 Toolchain files
@@ -585,6 +595,7 @@ Each commit runs `uv run ruff check -q && uv run pytest -q` (S20). Only `test_re
   - the 1.6 MCP add + Authenticate flow, unless a contributor with a Supabase project runs it
   - the version check on Desktop-bundled installs (it skips), and the PATH-binary limitation (RV3-L4)
   - the **bash variant on macOS** (portable commands required, but only run on Linux/WSL; RV5-L3)
+  - the **bash clean-slate blocks under Git Bash on Windows**, the main Windows path for them. There `git rev-parse` returns `C:/…` while `pwd -P` returns `/c/…`, links are often junctions, and the repo guard's comparison is case-sensitive, so the guard could miss a path (third review L1). Files would be moved, not deleted
   - the **PowerShell variant of the clean-slate move** (RV3-M3). It follows the bash variant's rules and is lint-checked for delete verbs, but has never run on Windows
 - **Future concerns:** §9.
 - **Reviewer note:** Hebrew changes need a Hebrew-speaking contributor's approval.
@@ -643,7 +654,7 @@ Manual checks 4–6, the VAT grep and `spoken_lesson_refs` cover changes that §
 | Unit | Concern carried forward |
 |---|---|
 | M | Drop `auto-save-progress.ps1` and the slide viewer; the CLAUDE.md module table and its lint. **Before `tutor_refs` can serve as M's done-when (PRD D8d), M must extend it to resolve `${CLAUDE_SKILL_DIR}/…` against the folder of the nearest `SKILL.md`, with seeded tests (RV2-M4).** Otherwise the lint passes vacuously |
-| F | `landscape.md` (including the Claude Code floor and the Node row); baseline/model-string/full denylist; the rest of CONTRIBUTING; the style guide; `changes.md` → Keep-a-Changelog; `quiz.md:14` Hebrew triggers; `jsonschema` in the dev group if needed |
+| F | `landscape.md` (including the Claude Code floor and the Node row); baseline/model-string/full denylist; the rest of CONTRIBUTING; the style guide (**including the Hebrew style rules of §4.2 "Voice", for the whole course**); `changes.md` → Keep-a-Changelog; `quiz.md:14` Hebrew triggers; `jsonschema` in the dev group if needed |
 | **N (proposed)** | Numbering contract:<br>• stable lesson ids as the contract; numbers derived<br>• a manifest<br>• a deterministic generator (COURSE.md tables, exercise and script headers, inside `<!-- generated -->` markers)<br>• CI `--check`<br>• id references in prose<br>• a thin `renumber`/`add-lesson` skill<br>• a CLAUDE.md rule to run the generator before any push (convenience; CI enforces)<br>Replaces `header_numbers` and `spoken_lesson_refs` |
 | G | Interpreter resolution; owned `settings.local.json` entries; the no-`python3` lint; branch protection. **Constraints: learner tooling must not require uv; no `.python-version` at the repo root** |
 | 1a | The full 1.3 lab; macOS/Windows OS-lock equivalents (UNVERIFIED); 1.2 fixes; 1.1 homework |
@@ -651,7 +662,8 @@ Manual checks 4–6, the VAT grep and `spoken_lesson_refs` cover changes that §
 | 1c | Module 02 rename. `2.5_script.txt:97` expands MCP as "Multi-Claude-Pipeline" (RV3-L12). **If 2.0 teaches uv, learner projects live outside the repo folder** (uv project discovery would otherwise attach to `tov-learn`) |
 | 1d | `@supabase/ssr`/auth rewrite; Prisma removal; an end-to-end check of the MCP flow |
 | 1e | Restore `/learn project` and the resume offer; delete the TEMPORARY blocks; `projects.md:7` |
-| Gate | Remove the README tester note, the CLEAN-SLATE section and `clean_slate_no_delete` |
+| 1a–1e | Each slice applies the §4.2 Hebrew style rules to every script, exercise and tutor line it touches, where applicable, and removes the matching `SPOKEN_ALLOWLIST` entries it converts |
+| Gate | Remove the README tester note, the CLEAN-SLATE section, `clean_slate_no_delete` and the `test_clean_slate_*` behavioural tests (they read the section out of `setup.md` and would fail with an IndexError) |
 | S2a | Whether `learn.md` stays model-invocable; 3-OS pytest CI (already on uv); learner CLI without uv; Dependabot `uv` once 0.12 support is confirmed |
 
 ---
@@ -771,6 +783,55 @@ A fresh Opus 5.5 Plan agent (single, read-only, no context; told to ignore the d
 | RV5-L7 | `progress.md` keys on "stop" only | Two trigger lines edited |
 | RV5-L8 | Approval location is version-dependent | "from v2.1.211" |
 | RV5-L9 | Small inconsistencies (CONTRIBUTING wording, done-when mapping, S18 and docs PR, line shifts, lab location) | Each fixed in place |
+
+### Final branch review (2026-10-01, rev 6.2)
+A fresh single-agent Opus 5.5 review of the finished branch raised 2 Medium and 10 Low findings. The user approved fixing all of them, each as its own commit.
+
+| # | Finding | Resolution |
+|---|---|---|
+| FR-M1 | `0.4_script.txt` still named "Module One: Business Automations" (Make.com) and a "Module Five". §4.2's inventory missed them, and RV4/RV5 reported no content gaps | Both lines now name Module 01 (Claude Code) and Module 02 (Claude API) |
+| FR-M2 | The clean-slate move could move the repo's own files through a symlinked `~/.claude/commands` | §4.3 guard (`SKIP`), behavioural tests |
+| FR-L1 | `changes.md` #13 misdescribed the old exercise | Reworded |
+| FR-L2 | `git ls-files` makes untracked files invisible locally but not in CI | CLAUDE.md and CONTRIBUTING say `git add` first |
+| FR-L3 | `test_worktree_git_file` depended on the global git config | Signing and hooks pinned off |
+| FR-L4 | Root-absolute links; a missing `git` executable | §5.1 |
+| FR-L5 | P1's commit message says "C, T and D" | Plan template fixed; the commit is not rewritten |
+| FR-L6, L7 | Wrong test file named; the frontmatter claim was too strong | Reworded |
+| FR-L8 | `1.1_script.txt:1` "אחת נקודה אחד"; masculine "מודול אחת" | The first is fixed; the second is left for the Hebrew reviewer |
+| FR-L9 | The step-0 prompt called live progress "a previous install" | Prompt reworded |
+| FR-L10 | 1.6 omitted the project-scope approval prompt | One sentence added |
+
+A second review of the fixed branch (same setup) raised 2 Medium and 7 Low findings. The user approved fixing all but two Low ones.
+
+| # | Finding | Resolution |
+|---|---|---|
+| SR-M1 | The guard didn't skip a path that contains the repo | §4.3: skipped both ways; two behavioural tests |
+| SR-M2 | `0.2_script.txt` promised Make, n8n and ManyChat | Rewritten to Module 02's tools; `2.5_script.txt:2` left for 1c |
+| SR-L1, L2 | Wrong commit count and "revision 6.1" in the plan | Fixed |
+| SR-L3, L4 | PowerShell guard failed without git; prefix test had no separator | Fixed |
+| SR-L5 | `--show-toplevel` misses the main checkout from a linked worktree | **Not fixed**: the spec names `--show-toplevel`; contributors only |
+| SR-L6 | A `.git` that git refuses to read crashed the lints | §5.1: walk instead |
+| SR-L7 | Three small validator gaps | **Not fixed**: none affects the tree |
+
+A third review (same setup) raised no High or Medium findings, 10 Low and 2 nits. The user approved fixing items 1–6, 8 and 10.
+
+| # | Finding | Resolution |
+|---|---|---|
+| TR-L1 | The bash clean-slate blocks are untested under Git Bash on Windows | Added to §6.2's untested list (and so to the PR) |
+| TR-L2 | The gate checklist omitted the clean-slate behavioural tests | §9 Gate row |
+| TR-L3, L4, L5 | `changes.md`: the review fixes weren't described; entry 9 overstated the frontmatter; entry 6's "Before" was slightly wrong | Fixed |
+| TR-L6 | This header said three content items | Four |
+| TR-L7 | `relative_links` skips the outer target of `[![img](a)](b)` | **Not fixed**: a new lint gap, not in the spec |
+| TR-L8 | `test_worktree_git_file` pinned git config for `commit` only | Every git call in the git-tree tests ignores global and system config |
+| TR-L9 | Two silent fallbacks (`inside_repo` on a failed `cd`, `repo_files` on a git error) | **Not changed**: they match the spec as written |
+| TR-L10 | The 1.6 dummy row had no `accountant_id`, so the RLS policy hid it | The step now says to set it (the rest is 1d's) |
+| nits | `"בוחן"` listed before `"בוחן מלא"`; an empty backup folder if everything is skipped | **Not changed**: same ambiguity as the existing `quiz me` rows; harmless |
+
+### Hebrew style rules (2026-10-04, rev 6.3)
+The maintainer asked for three rules for the Hebrew replacement text (§4.2 "Voice") and for them to apply to the whole course where applicable. Stage 0 applies them to the script lines it changed (commit "numerals for lesson, module and version numbers; English for technical terms"); the rest follows with the owning units (§9). Side effects: "מודול אחת" is now "מודול 1", which removes the masculine-noun / feminine-number question that was deferred to the Hebrew reviewer (FR-L8), and the `1.3` hook narration no longer spells out file and event names.
+
+### Hebrew style rules, second round (2026-10-09, rev 6.4)
+The maintainer gave a list of terms (the 1.1, 1.3, 2.3, 2.5 and 2.6 scripts, the 0.2 exercises) and asked for the same treatment, "only in files that this stage touches", for similar terms and file names. Applied to all 30 touched script and exercise files: Claude, Claude Code, Anthropic, CLAUDE.md and other file names, hooks, skills, session, loop, routines, webhooks, Stripe, GitHub, WhatsApp, JSON, USB-C, "Calculate VAT and Total", 18%, years as numerals, plus product, tool and protocol names and acronyms spelled by letter (MCP, Next.js, Tailwind, Cloudflare, Workers, Supabase, CLI, URL, HTML, CSS and so on). Decided by the maintainer: "קלוד שאנון" (a person) stays Hebrew; the 1.8 script says `wrangler.jsonc`, as the exercises do, and its wrangler commands, "Worker" and OpenAI are English; the remaining cases are English too (Bolt, Replit Agent 3, Wolt, OWASP Top 10, and the identifiers `fetch_vat_logs`, `get_time`, `get_current_time` and `landing-page-ai`, which are our reading of the spoken forms); "Calculate VAT and Total" is as written, not "VATS"; the softer loanwords stay Hebrew; the TTS listening check is pending. A stray Cyrillic letter that was already in `1.8_script.txt:37` ("ביлד") was fixed on the way.
 
 ### Plan review (2026-09-29, rev 6.1)
 A fresh single-agent review of the implementation plan also reported four editorial inconsistencies in this spec. All were fixed in place, and no decision changed. Its plan findings were fixed in the plan.

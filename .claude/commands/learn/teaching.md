@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Teaching Module
 
 *Loaded by learn.md when the learner selects a lesson. TTS helper is defined in learn.md and available in this session.*

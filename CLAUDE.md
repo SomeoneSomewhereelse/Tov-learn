@@ -11,7 +11,7 @@
 | מודול | קובץ | תוכן |
 |-------|------|------|
 | Entry point + routing | `.claude/commands/learn.md` | Routing + TTS helper + Step 0-2 |
-| Setup | `.claude/commands/learn/setup.md` | הגדרות ראשוניות, קול, global install |
+| Setup | `.claude/commands/learn/setup.md` | הגדרות ראשוניות, קול |
 | Resume | `.claude/commands/learn/resume.md` | Smart entry — suggests next action based on progress |
 | Teaching | `.claude/commands/learn/teaching.md` | טעינת שיעור, Journey format, לולאת הוראה |
 | Quiz | `.claude/commands/learn/quiz.md` | בחינה, ציונים, spaced repetition |
@@ -70,6 +70,18 @@ architectures/[project-name].html     ← מפות ארכיטקטורה
 ## הוספת מודול חדש
 
 1. צור קובץ ב-`.claude/commands/learn/[module-name].md`
-2. הוסף שורה לטבלת ה-Modules למעלה
-3. הוסף routing ב-`learn.md` (Step 2 — Route table)
-4. (אופציונלי) אם ההתקנה הגלובלית מופעלת — עדכן את רשימת הקבצים שמועתקים ב-`setup.md` סעיף F. ברירת מחדל: `/learn` רץ מתוך הריפו בלבד, ללא התקנה גלובלית.
+2. התחל את הקובץ בבלוק ה-frontmatter של `disable-model-invocation: true` (שלוש שורות: `---`, `disable-model-invocation: true`, `---`), כדי שקלוד לא יפעיל את המודול כפקודה בעצמו
+3. הוסף שורה לטבלת ה-Modules למעלה
+4. הוסף routing ב-`learn.md` (Step 2 — Route table)
+
+---
+
+## בדיקות (למפתחי הקורס בלבד — contributors only)
+
+לומדים לא צריכים את זה. מפתחי הקורס צריכים את [uv](https://docs.astral.sh/uv/getting-started/installation/); זו נקודת הכניסה היחידה הנתמכת לבדיקות:
+
+```
+uv run ruff check -q && uv run pytest -q
+```
+
+אם pytest אדום, הריצו שוב `uv run pytest -v` כדי לראות אילו בדיקות נכשלו. רוב הבדיקות קוראות רק קבצים ש-git מכיר (כמו ב-CI), אז הריצו `git add` על קבצים חדשים לפני הבדיקה, אחרת התוצאה המקומית תהיה שונה מזו של CI. הבדיקות נמצאות ב-`tests/test_validate_structure.py`, והכללים שהן בודקות ב-`tests/validate_structure.py`.

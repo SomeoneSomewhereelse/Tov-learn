@@ -10,3 +10,9 @@ Thumbs.db
 
 # user export data
 *.zip
+
+# Contributor toolchain (uv / pytest / ruff)
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/

@@ -1,3 +1,6 @@
+---
+disable-model-invocation: true
+---
 # Deploy Module — איזה כלי פריסה לבחור
 
 *Loaded when /learn is called with "deploy" argument, or when a learner asks how/where to deploy a project.*
